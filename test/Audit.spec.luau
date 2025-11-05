@@ -1,0 +1,10 @@
+return function()
+	local Rep = game:GetService("ReplicatedStorage")
+	describe("Folders present", function()
+		it("has Systems/Components/Shared", function()
+			assert(Rep:FindFirstChild("Systems"), "Systems missing")
+			assert(Rep:FindFirstChild("Components"), "Components missing")
+			assert(Rep:FindFirstChild("Shared"), "Shared missing")
+		end)
+	end)
+end

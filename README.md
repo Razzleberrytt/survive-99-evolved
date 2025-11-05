@@ -39,3 +39,10 @@ Mobile-first co-op survive-the-night game on Roblox.
 - **Icon Scene**: Type `/iconscene`, then `/iconA`, `/iconB`, `/iconC` to frame shots. Use Studio Screenshot.
 - **Release Commands**: `/shipcheck` (readiness), `/release` (final checklist).
 - **LiveConfig**: Server writes overrides to MemoryStore key `Survive99_LiveConfig_v1/live`.
+
+## Audit & Hardening
+- In Studio (Play), type **/audit**. Output prints ✅/❌ for:
+  - StreamingEnabled, Replicated folders, Remotes, Systems, Actors, Physics groups, LiveConfig/Tuning, DataService
+  - A short Heartbeat perf probe
+- Remote rate monitor logs warnings if a client spams **NightStartVote**.
+- Keep `RemoteWatch.server.lua` around in soft-launch, then disable if too noisy.
