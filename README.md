@@ -46,3 +46,13 @@ Mobile-first co-op survive-the-night game on Roblox.
   - A short Heartbeat perf probe
 - Remote rate monitor logs warnings if a client spams **NightStartVote**.
 - Keep `RemoteWatch.server.lua` around in soft-launch, then disable if too noisy.
+
+## Atmosphere & Art Swap Pack
+- Presets live in `Shared/Config/Atmosphere.lua` (`Eerie`, `Dusk`, `Clear`). Omen effects tweak fog/bloom/clock.
+- Client applies presets automatically; accessibility “Reduce Flashes” trims bloom/DOF.
+- Ambient loops adjust by phase/omen (`Ambience.client.lua`). Replace SoundIds.
+- Enemy models: place under `ReplicatedStorage/Assets/Models/Enemies/<Kind>/Rig`. Fallback is a Part.
+- Dev commands:
+  - `/mood Eerie|Dusk|Clear` — cycle local preset (server pushes on night/day).
+  - `/preset` — print current preset.
+- Performance tips: keep texture resolutions modest (≤1024), avoid >100 active point lights, ensure enemy models have a single PrimaryPart.

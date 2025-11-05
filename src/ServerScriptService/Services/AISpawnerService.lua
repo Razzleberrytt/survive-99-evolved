@@ -14,6 +14,8 @@ local PathComp = require(Rep.Components.C_Path)
 local Loot = require(Rep.Components.C_Loot)
 local Boss = require(Rep.Components.C_Boss)
 
+local AssetLoader = require(script.Parent.AssetLoader)
+
 local M = {}
 local active = 0
 
@@ -25,17 +27,20 @@ local DMG_BY_KIND = {
 }
 
 local function makeEnemyPart(kind, position)
-	local p = Instance.new("Part")
-	p.Name = "Enemy_" .. kind
-	p.Size = Vector3.new(2,3,2)
-	p.Material = Enum.Material.SmoothPlastic
-	p.Color = (kind=="Miniboss") and Color3.fromRGB(170,0,0) or Color3.fromRGB(200, 60, 60)
-	p.Position = position + Vector3.new(0,2,0)
-	p.Anchored = false
-	p.CanCollide = true
-	p.Parent = workspace
-	local att = Instance.new("Attachment", p) att.Name = "Root"
-	return p
+  local model = AssetLoader.CloneEnemy(kind, position)
+  if model then
+    return model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+  end
+  local p = Instance.new("Part")
+  p.Name = "Enemy_" .. kind
+  p.Size = Vector3.new(2,3,2)
+  p.Material = Enum.Material.SmoothPlastic
+  p.Color = (kind=="Miniboss") and Color3.fromRGB(170,0,0) or Color3.fromRGB(200,60,60)
+  p.Position = position + Vector3.new(0,2,0)
+  p.Anchored = false
+  p.CanCollide = true
+  p.Parent = workspace
+  return p
 end
 
 local function spawnOne(kind, position)
