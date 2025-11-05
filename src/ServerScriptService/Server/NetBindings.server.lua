@@ -37,6 +37,11 @@ Net.GetProfile.OnServerInvoke = function(player)
 	return DataService.GetProfileSnapshot(player)
 end
 
+Net.PerfPing.OnServerInvoke = function(player, tClient)
+	-- return server time; client uses for RTT estimate
+	return os.clock()
+end
+
 Net.ToggleSetting.OnServerInvoke = function(player, category, key, value)
 	return SettingsService.Toggle(player, category, key, value)
 end

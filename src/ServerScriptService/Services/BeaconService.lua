@@ -51,6 +51,7 @@ end
 
 function M.OnNightStart()
 	state.fuel = clamp(state.fuel - C.Beacon.FuelDrainPerNight, 0, 100)
+	Net.SpawnVFX:FireAllClients({ kind="particle", position = M.GetCFrame().Position })
 	Net.PlaySound:FireAllClients("beacon_on")
 	if state.fuel <= 0 then
 		Net.PlaySound:FireAllClients("beacon_off")

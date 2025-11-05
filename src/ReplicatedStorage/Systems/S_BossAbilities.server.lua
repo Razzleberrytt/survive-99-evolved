@@ -41,6 +41,7 @@ return function(world, dt)
 						end
 					end
 				end
+				Net.SpawnVFX:FireAllClients({ kind="particle", position = pos, lifetime = 0.9, })
 				-- Beacon fuel nudge
 				local dBeacon = (BeaconService.GetCFrame().Position - pos).Magnitude
 				if dBeacon < 60 then BeaconService.ApplyFuel(-3) end
