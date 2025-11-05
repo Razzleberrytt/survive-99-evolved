@@ -1,43 +1,66 @@
+local Rep = game:GetService("ReplicatedStorage")
+local Net = require(Rep.Remotes.Net)
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
 
-local Net = require(ReplicatedStorage.Remotes.Net)
+local gui = Instance.new("ScreenGui"); gui.Name = "HUD"; gui.ResetOnSpawn = false; gui.Parent = player:WaitForChild("PlayerGui")
 
-local playerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "HUD"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
-
-local function createLabel(name: string, position: UDim2)
-	local label = Instance.new("TextLabel")
-	label.Name = name
-	label.Size = UDim2.new(0, 220, 0, 28)
-	label.Position = position
-	label.BackgroundTransparency = 0.3
-	label.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.Font = Enum.Font.GothamMedium
-	label.TextSize = 18
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.Text = "--"
-	label.Parent = screenGui
-	return label
+local function makeLabel(name, posY)
+	local t = Instance.new("TextLabel")
+	t.Name = name; t.AnchorPoint = Vector2.new(0,0); t.Position = UDim2.new(0, 12, 0, posY)
+	t.Size = UDim2.new(0, 320, 0, 28)
+	t.TextXAlignment = Enum.TextXAlignment.Left
+	t.BackgroundTransparency = 0.3
+	t.TextScaled = false; t.Font = Enum.Font.GothamBold; t.TextSize = 18
+	t.Parent = gui
+	return t
 end
 
-local nightLabel = createLabel("NightLabel", UDim2.fromOffset(20, 20))
-local fuelLabel = createLabel("FuelLabel", UDim2.fromOffset(20, 52))
-local squadsLabel = createLabel("SquadsLabel", UDim2.fromOffset(20, 84))
+local lblTop = makeLabel("Top", 12)
+local lblMid = makeLabel("Mid", 44)
+local caption = makeLabel("Caption", 76)
 
-local function update(state)
-	if not state then
-		return
-	end
-	nightLabel.Text = string.format("Night %d | Phase %s", state.night or 0, state.phase or "--")
-	local beacon = state.beacon or {}
-	fuelLabel.Text = string.format("Fuel %.0f | Heat %.0f", beacon.fuel or 0, beacon.heat or 0)
-	squadsLabel.Text = string.format("Active Squads %s", tostring(state.activeSquads or "--"))
+local function makeButton(name, x, text, callback)
+	local b = Instance.new("TextButton"); b.Name = name; b.Text = text
+	b.Size = UDim2.new(0, 120, 0, 40); b.Position = UDim2.new(0, x, 1, -52); b.AnchorPoint = Vector2.new(0,1)
+	b.Parent = gui
+	b.MouseButton1Click:Connect(function() pcall(callback) end)
+	return b
 end
 
-Net.BroadcastState.OnClientEvent:Connect(update)
+makeButton("StartNight", 12, "Start Night", function()
+	Net.NightStartVote:FireServer()
+end)
+
+makeButton("FuelPlus", 140, "+5 Fuel", function()
+	local ok, res = Net.FuelBeacon:InvokeServer(5)
+end)
+
+local night, phase, omen = 0, "Lobby", ""
+local function draw()
+	lblTop.Text = string.format("Night %d  |  Phase %s", night, phase)
+	lblMid.Text = omen ~= "" and ("Omen: "..omen) or ""
+end
+
+Net.BroadcastState.OnClientEvent:Connect(function(state)
+	night = state.night or night
+	phase = state.phase or phase
+	omen = state.omen or ""
+	draw()
+end)
+
+Net.BeaconChanged.OnClientEvent:Connect(function(s)
+	caption.Text = string.format("Beacon Fuel:%d Heat:%d Radius:%d", s.fuel, s.heat, s.lightRadius)
+end)
+
+draw()
+
+-- Caption helpers
+local function setCaption(text)
+	caption.Text = text
+	task.delay(2.5, function() if caption.Text == text then caption.Text = "" end end)
+end
+
+Net.BroadcastState.OnClientEvent:Connect(function(state)
+	if state.omen then setCaption("Omen: "..tostring(state.omen)) end
+end)

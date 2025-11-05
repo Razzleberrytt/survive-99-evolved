@@ -1,29 +1,41 @@
---!strict
+local Players = game:GetService("Players")
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- Try to require a ProfileStore module placed at ServerScriptService/Services/ProfileStore.lua (optional).
+local ProfileStore
+pcall(function() ProfileStore = require(script.Parent:FindFirstChild("ProfileStore")) end)
 
-local Vendor = ReplicatedStorage:WaitForChild("Vendor")
-local ProfilestoreFolder = Vendor:WaitForChild("Profilestore")
-local ProfileStore = require(ProfilestoreFolder:WaitForChild("ProfileStore"))
+local profiles = {} -- in-memory fallback
 
-local DataService = {}
+local TEMPLATE = {
+	_schema = 1,
+	bestNight = 0,
+	totalRescues = 0,
+	currencies = { shards = 0 },
+	talents = {},
+	cosmetics = { outfits = {}, emotes = {}, campThemes = {} },
+	beaconModsOwned = {},
+	settings = { accessibility = { captions = true, reduceFlashes = true }, input = { stickLayout = "default" } },
+}
 
-local profiles: { [Player]: any } = {}
+local M = {}
 
-function DataService.loadProfileAsync(player: Player)
-	-- TODO: tie into ProfileStore; currently placeholder table.
-	profiles[player] = {
-		userId = player.UserId,
-	}
-	return profiles[player]
+function M.LoadProfileAsync(player)
+	if ProfileStore then
+		-- TODO: wire actual ProfileStore here (session locking)
+		-- For now, still fall back to memory to avoid Studio DataStore prompts.
+	end
+	profiles[player.UserId] = profiles[player.UserId] or table.clone(TEMPLATE)
+	return profiles[player.UserId]
 end
 
-function DataService.saveProfileAsync(player: Player)
-	-- TODO: commit profile back to ProfileStore.
+function M.SaveProfileAsync(player)
+	return true
 end
 
-function DataService.award(player: Player, reward)
-	-- TODO: mutate profile currencies / unlocks.
+function M.Award(player, item)
+	local prof = profiles[player.UserId]; if not prof then return false end
+	table.insert(prof.beaconModsOwned, item)
+	return true
 end
 
-return DataService
+return M

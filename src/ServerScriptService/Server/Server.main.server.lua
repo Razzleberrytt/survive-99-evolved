@@ -1,27 +1,35 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-
 local Matter = require(ReplicatedStorage.Packages.matter)
 
-local world = Matter.World.new()
+-- Matter world
+local World = Matter.World.new()
 
-local systemsFolder = ReplicatedStorage:WaitForChild("Systems")
+-- Systems
+local Systems = ReplicatedStorage.Systems
 local systemFns = {
-	require(systemsFolder.S_ThreatMap),
-	require(systemsFolder.S_AISquadBrain),
-	require(systemsFolder.S_StructureDamage),
-	require(systemsFolder.S_Trap),
-	require(systemsFolder.S_BeaconAura),
-	require(systemsFolder.S_Cleanup),
+	require(Systems.S_ThreatMap),
+	require(Systems.S_AISquadBrain),
+	require(Systems.S_StructureDamage),
+	require(Systems.S_Trap),
+	require(Systems.S_BeaconAura),
+	require(Systems.S_Cleanup),
 }
 
-local servicesFolder = script.Parent.Parent:WaitForChild("Services")
-local GameService = require(servicesFolder.GameService)
+-- Services
+local ServicesFolder = script.Parent.Parent:WaitForChild("Services")
+local GameService = require(ServicesFolder.GameService)
+local DataService = require(ServicesFolder.DataService)
+local BeaconService = require(ServicesFolder.BeaconService)
 
-GameService.start(world)
+game.Players.PlayerAdded:Connect(function(plr) DataService.LoadProfileAsync(plr) end)
+game.Players.PlayerRemoving:Connect(function(plr) DataService.SaveProfileAsync(plr) end)
+
+GameService.start(World)
 
 RunService.Stepped:Connect(function(_, dt)
-	for _, sys in ipairs(systemFns) do
-		sys(world, dt)
-	end
+	for _, sys in systemFns do sys(World, dt) end
 end)
+
+-- Ensure beacon UI gets an initial push
+task.delay(0.5, function() local s = BeaconService.GetState and BeaconService.GetState() if s then require(ReplicatedStorage.Remotes.Net).BeaconChanged:FireAllClients(s) end end)

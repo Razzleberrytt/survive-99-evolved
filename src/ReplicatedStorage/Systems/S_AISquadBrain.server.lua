@@ -1,17 +1,14 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local AIState = require(ReplicatedStorage.Components.C_AIState)
-local Health = require(ReplicatedStorage.Components.C_Health)
-
-return function(world: any, dt: number?)
-	-- TODO: integrate with AIService order queue once implemented.
-	for id, ai, health in world:query(AIState, Health) do
-		-- Placeholder: basic state transitions based on health thresholds.
-		if health.hp <= 0 then
-			ai.state = "Defeated"
-		elseif health.hp < (0.25 * health.max) then
-			ai.state = "Retreat"
-		elseif ai.state == "Idle" then
-			ai.state = "Probe"
+local Rep = game:GetService("ReplicatedStorage")
+local AIState = require(Rep.Components.C_AIState)
+local Matter = require(Rep.Packages.matter)
+return function(world, dt)
+	for id, ai in world:query(AIState) do
+		-- TODO: integrate with AIService.SendPerceptionAndGetOrders
+		-- For now, keep state cycling every few seconds (placeholder)
+		ai.lastOrderTick += dt
+		if ai.lastOrderTick > 5 then
+			ai.state = (ai.state == "Probe") and "FocusBeacon" or "Probe"
+			ai.lastOrderTick = 0
 		end
 	end
 end
