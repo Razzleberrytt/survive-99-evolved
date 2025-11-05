@@ -12,6 +12,7 @@ local Motion = require(Rep.Components.C_Motion)
 local Attack = require(Rep.Components.C_Attack)
 local PathComp = require(Rep.Components.C_Path)
 local Loot = require(Rep.Components.C_Loot)
+local Boss = require(Rep.Components.C_Boss)
 
 local M = {}
 local active = 0
@@ -47,7 +48,7 @@ local function spawnOne(kind, position)
 	local speed = SPEED_BY_KIND[kind] or 12
 	local dmg = DMG_BY_KIND[kind] or 6
 
-	local id = world:spawn(
+	local comps = {
 		EnemyType({ kind = kind, speed = speed }),
 		InstanceRef({ inst = part }),
 		AIState({ state = "Probe" }),
@@ -56,8 +57,10 @@ local function spawnOne(kind, position)
 		PathComp({ points = {}, i = 1, rethink = 0 }),
 		Motion({ speed = speed }),
 		Attack({ damage = dmg, radius = (kind=="Miniboss") and 6 or 4, cooldown = (kind=="Miniboss") and 1.0 or 1.2 }),
-		Loot({ shards = (kind=="Miniboss") and 5 or 1 })
-	)
+		Loot({ shards = (kind=="Miniboss") and 5 or 1 }),
+	}
+	if kind == "Miniboss" then table.insert(comps, Boss({stompMax=7})) end
+	local id = world:spawn(table.unpack(comps))
 	return id
 end
 

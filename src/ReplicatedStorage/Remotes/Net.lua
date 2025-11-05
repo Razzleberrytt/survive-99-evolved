@@ -17,4 +17,6 @@ return {
 	BeaconChanged  = get("BeaconChanged","RemoteEvent"),
 	SpawnVFX       = get("SpawnVFX","RemoteEvent"),
 	TutorialEvent  = get("TutorialEvent","RemoteEvent"),
+	PlaySound     = get("PlaySound","RemoteEvent"),
+	ToggleSetting = get("ToggleSetting","RemoteFunction"),
 }

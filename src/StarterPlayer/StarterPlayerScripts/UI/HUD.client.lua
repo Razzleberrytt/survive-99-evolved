@@ -1,5 +1,6 @@
 local Rep = game:GetService("ReplicatedStorage")
 local Net = require(Rep.Remotes.Net)
+local Captions = require(Rep.Shared.Captions)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
@@ -19,6 +20,11 @@ end
 local lblTop = makeLabel("Top", 12)
 local lblMid = makeLabel("Mid", 44)
 local caption = makeLabel("Caption", 76)
+
+-- Caption helpers
+local function setCaption(text)
+	Captions.push(text, 2.5, function(msg) caption.Text = msg end)
+end
 
 local lblShards = Instance.new("TextLabel")
 lblShards.Size = UDim2.new(0, 200, 0, 28)
@@ -73,6 +79,11 @@ local btnEscort = makeButton("Escort", 528, "Escort", function()
 	Net.RescueInteract:InvokeServer("current", "Escort")
 end)
 
+local btnAcc = makeButton("Accessibility", 656, "Reduce Flashes", function()
+	local ok = Net.ToggleSetting:InvokeServer("accessibility", "reduceFlashes", true)
+	setCaption("Reduce flashes: ON")
+end)
+
 local shardCount = 0
 local function setShards(n) shardCount = n; lblShards.Text = "Shards: "..tostring(shardCount) end
 setShards(0)
@@ -110,16 +121,10 @@ Net.BroadcastState.OnClientEvent:Connect(function(state)
 end)
 
 Net.BeaconChanged.OnClientEvent:Connect(function(s)
-	caption.Text = string.format("Beacon Fuel:%d Heat:%d Radius:%d", s.fuel, s.heat, s.lightRadius)
+	setCaption(string.format("Beacon Fuel:%d Heat:%d Radius:%d", s.fuel, s.heat, s.lightRadius))
 end)
 
 draw()
-
--- Caption helpers
-local function setCaption(text)
-	caption.Text = text
-	task.delay(2.5, function() if caption.Text == text then caption.Text = "" end end)
-end
 
 Net.BroadcastState.OnClientEvent:Connect(function(state)
 	if state.omen then setCaption("Omen: "..tostring(state.omen)) end
@@ -127,10 +132,8 @@ end)
 
 Net.BroadcastState.OnClientEvent:Connect(function(state)
 	if state.rescue == "spawned" then
-		caption.Text = "Rescue available — find the blue flare!"
-		task.delay(2.5, function() if caption.Text == "Rescue available — find the blue flare!" then caption.Text = "" end end)
+		setCaption("Rescue available — find the blue flare!")
 	elseif state.rescue == "complete" then
-		caption.Text = "Rescue complete! Reward granted."
-		task.delay(2.5, function() if caption.Text == "Rescue complete! Reward granted." then caption.Text = "" end end)
+		setCaption("Rescue complete! Reward granted.")
 	end
 end)

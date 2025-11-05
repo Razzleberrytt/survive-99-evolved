@@ -4,6 +4,7 @@ local Throttle = require(script.Parent.Throttle)
 local BuildService = require(game.ServerScriptService.Services.BuildService)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local DataService = require(game.ServerScriptService.Services.DataService)
+local SettingsService = require(game.ServerScriptService.Services.SettingsService)
 
 Net.PlaceRequest.OnServerInvoke = function(player, placeType, cfTable)
 	if not Throttle.consume(player, "build", 1) then return false, "throttled" end
@@ -32,6 +33,10 @@ end
 
 Net.GetProfile.OnServerInvoke = function(player)
 	return DataService.GetProfileSnapshot(player)
+end
+
+Net.ToggleSetting.OnServerInvoke = function(player, category, key, value)
+	return SettingsService.Toggle(player, category, key, value)
 end
 
 local TutorialService = require(game.ServerScriptService.Services.TutorialService)
