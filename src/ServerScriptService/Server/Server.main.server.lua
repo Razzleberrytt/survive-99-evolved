@@ -22,6 +22,10 @@ local systemFns = {
 
 -- Services
 local ServicesFolder = script.Parent.Parent:WaitForChild("Services")
+local LiveConfig = require(ServicesFolder.LiveConfigService)
+LiveConfig.Start()
+local BugReport = require(ServicesFolder.BugReportService)
+BugReport.Start()
 local GameService = require(ServicesFolder.GameService)
 local DataService = require(ServicesFolder.DataService)
 local BeaconService = require(ServicesFolder.BeaconService)

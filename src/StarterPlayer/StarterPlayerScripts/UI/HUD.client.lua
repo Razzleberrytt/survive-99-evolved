@@ -84,6 +84,11 @@ local btnAcc = makeButton("Accessibility", 656, "Reduce Flashes", function()
 	setCaption("Reduce flashes: ON")
 end)
 
+local btnShop = makeButton("Shop", 780, "Shop", function()
+	local ok, res = Net.PurchaseProduct:InvokeServer("shards_100")
+	if not ok then setCaption("Shop unavailable: "..tostring(res)) else setCaption("Purchase prompt opened") end
+end)
+
 local shardCount = 0
 local function setShards(n) shardCount = n; lblShards.Text = "Shards: "..tostring(shardCount) end
 setShards(0)
