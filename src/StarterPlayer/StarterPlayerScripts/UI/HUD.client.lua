@@ -20,6 +20,15 @@ local lblTop = makeLabel("Top", 12)
 local lblMid = makeLabel("Mid", 44)
 local caption = makeLabel("Caption", 76)
 
+local lblShards = Instance.new("TextLabel")
+lblShards.Size = UDim2.new(0, 200, 0, 28)
+lblShards.Position = UDim2.new(0, 12, 0, 108)
+lblShards.BackgroundTransparency = 0.3
+lblShards.TextXAlignment = Enum.TextXAlignment.Left
+lblShards.Font = Enum.Font.GothamBold
+lblShards.TextSize = 18
+lblShards.Parent = gui
+
 local function makeButton(name, x, text, callback)
 	local b = Instance.new("TextButton"); b.Name = name; b.Text = text
 	b.Size = UDim2.new(0, 120, 0, 40); b.Position = UDim2.new(0, x, 1, -52); b.AnchorPoint = Vector2.new(0,1)
@@ -60,6 +69,14 @@ makeButton("PlaceSpike", 400, "Place Spike", function()
 	local ok = Net.PlaceRequest:InvokeServer("TrapSpike", {X=cf.X, Y=cf.Y, Z=cf.Z})
 end)
 
+local btnEscort = makeButton("Escort", 528, "Escort", function()
+	Net.RescueInteract:InvokeServer("current", "Escort")
+end)
+
+local shardCount = 0
+local function setShards(n) shardCount = n; lblShards.Text = "Shards: "..tostring(shardCount) end
+setShards(0)
+
 -- Count updates when BroadcastState arrives (just refresh)
 local function refreshCount()
 	local n = 0
@@ -81,6 +98,7 @@ Net.BroadcastState.OnClientEvent:Connect(function(state)
 	night = state.night or night
 	phase = state.phase or phase
 	omen = state.omen or ""
+	if state.shards ~= nil then setShards(state.shards) end
 	draw()
 end)
 
@@ -98,4 +116,14 @@ end
 
 Net.BroadcastState.OnClientEvent:Connect(function(state)
 	if state.omen then setCaption("Omen: "..tostring(state.omen)) end
+end)
+
+Net.BroadcastState.OnClientEvent:Connect(function(state)
+	if state.rescue == "spawned" then
+		caption.Text = "Rescue available — find the blue flare!"
+		task.delay(2.5, function() if caption.Text == "Rescue available — find the blue flare!" then caption.Text = "" end end)
+	elseif state.rescue == "complete" then
+		caption.Text = "Rescue complete! Reward granted."
+		task.delay(2.5, function() if caption.Text == "Rescue complete! Reward granted." then caption.Text = "" end end)
+	end
 end)

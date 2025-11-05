@@ -10,6 +10,8 @@ local Health = require(Rep.Components.C_Health)
 local Target = require(Rep.Components.C_Target)
 local Motion = require(Rep.Components.C_Motion)
 local Attack = require(Rep.Components.C_Attack)
+local PathComp = require(Rep.Components.C_Path)
+local Loot = require(Rep.Components.C_Loot)
 
 local M = {}
 local active = 0
@@ -51,8 +53,10 @@ local function spawnOne(kind, position)
 		AIState({ state = "Probe" }),
 		Health({ hp = (kind=="Miniboss") and 600 or 100, max = (kind=="Miniboss") and 600 or 100 }),
 		Target({ target = nil }),
+		PathComp({ points = {}, i = 1, rethink = 0 }),
 		Motion({ speed = speed }),
-		Attack({ damage = dmg, radius = (kind=="Miniboss") and 6 or 4, cooldown = (kind=="Miniboss") and 1.0 or 1.2 })
+		Attack({ damage = dmg, radius = (kind=="Miniboss") and 6 or 4, cooldown = (kind=="Miniboss") and 1.0 or 1.2 }),
+		Loot({ shards = (kind=="Miniboss") and 5 or 1 })
 	)
 	return id
 end

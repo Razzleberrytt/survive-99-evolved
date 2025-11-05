@@ -1,11 +1,8 @@
 local Players = game:GetService("Players")
-
--- Try to require a ProfileStore module placed at ServerScriptService/Services/ProfileStore.lua (optional).
-local ProfileStore
+local ProfileStore -- optional
 pcall(function() ProfileStore = require(script.Parent:FindFirstChild("ProfileStore")) end)
 
-local profiles = {} -- in-memory fallback
-
+local profiles = {}
 local TEMPLATE = {
 	_schema = 1,
 	bestNight = 0,
@@ -21,21 +18,33 @@ local M = {}
 
 function M.LoadProfileAsync(player)
 	if ProfileStore then
-		-- TODO: wire actual ProfileStore here (session locking)
-		-- For now, still fall back to memory to avoid Studio DataStore prompts.
+		-- TODO: wire actual ProfileStore binding here; keep fallback for Studio dev
 	end
 	profiles[player.UserId] = profiles[player.UserId] or table.clone(TEMPLATE)
 	return profiles[player.UserId]
 end
 
 function M.SaveProfileAsync(player)
+	-- TODO: if ProfileStore present, write back; else noop
 	return true
 end
 
-function M.Award(player, item)
-	local prof = profiles[player.UserId]; if not prof then return false end
-	table.insert(prof.beaconModsOwned, item)
-	return true
+function M.AddShards(player, amount)
+	local p = profiles[player.UserId] or M.LoadProfileAsync(player)
+	p.currencies.shards += amount
+	return p.currencies.shards
+end
+
+function M.GrantBlueprintOrToken(userId)
+	for _, plr in ipairs(Players:GetPlayers()) do
+		if plr.UserId == userId then
+			M.AddShards(plr, 3)
+			local p = profiles[userId]
+			p.totalRescues += 1
+			return true
+		end
+	end
+	return false
 end
 
 return M

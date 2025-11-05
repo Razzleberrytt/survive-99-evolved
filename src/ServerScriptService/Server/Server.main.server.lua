@@ -10,10 +10,12 @@ local Systems = ReplicatedStorage.Systems
 local systemFns = {
 	require(Systems.S_ThreatMap),
 	require(Systems.S_AISquadBrain),
+	require(Systems.S_PathfindAI),
 	require(Systems.S_MoveAI),
 	require(Systems.S_EnemyAttack),
 	require(Systems.S_Trap),
 	require(Systems.S_BeaconAura),
+	require(Systems.S_HealthDeath),
 	require(Systems.S_Cleanup),
 }
 

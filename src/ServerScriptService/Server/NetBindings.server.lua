@@ -3,7 +3,6 @@ local Net = require(Rep.Remotes.Net)
 local Throttle = require(script.Parent.Throttle)
 local BuildService = require(game.ServerScriptService.Services.BuildService)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
-local RescueService = require(game.ServerScriptService.Services.RescueService)
 
 Net.PlaceRequest.OnServerInvoke = function(player, placeType, cfTable)
 	if not Throttle.consume(player, "build", 1) then return false, "throttled" end
@@ -24,6 +23,8 @@ Net.FuelBeacon.OnServerInvoke = function(player, amount)
 end
 
 Net.RescueInteract.OnServerInvoke = function(player, id, action)
-	if not Throttle.consume(player, "rescue", 1) then return false, "throttled" end
-	return true, (RescueService.Interact and RescueService.Interact(player, id, action)) or false
+	local ok, res = pcall(function()
+		return require(game.ServerScriptService.Services.RescueService).Interact(player, id, action)
+	end)
+	return ok and res or false
 end
