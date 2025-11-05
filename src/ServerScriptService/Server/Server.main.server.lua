@@ -1,16 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Matter = require(ReplicatedStorage.Packages.matter)
+local WorldRegistry = require(ReplicatedStorage.Shared.WorldRegistry)
 
--- Matter world
 local World = Matter.World.new()
+WorldRegistry.set(World)
 
--- Systems
 local Systems = ReplicatedStorage.Systems
 local systemFns = {
 	require(Systems.S_ThreatMap),
 	require(Systems.S_AISquadBrain),
-	require(Systems.S_StructureDamage),
+	require(Systems.S_MoveAI),
+	require(Systems.S_EnemyAttack),
 	require(Systems.S_Trap),
 	require(Systems.S_BeaconAura),
 	require(Systems.S_Cleanup),

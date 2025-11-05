@@ -1,10 +1,18 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local BeaconAura = require(ReplicatedStorage.Components.C_BeaconAura)
+local Rep = game:GetService("ReplicatedStorage")
+local Matter = require(Rep.Packages.matter)
+local InstanceRef = require(Rep.Components.C_InstanceRef)
+local EnemyType = require(Rep.Components.C_EnemyType)
+local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 
-return function(world: any, dt: number?)
-	-- TODO: Integrate with BeaconService to apply aura weaken multipliers.
-	for id, aura in world:query(BeaconAura) do
-		-- Placeholder: ensure radius remains within reasonable bounds.
-		aura.radius = math.max(0, aura.radius)
+return function(world, dt)
+	local beaconCF = BeaconService.GetCFrame()
+	for id, et, ref in world:query(EnemyType, InstanceRef) do
+		if et.kind == "Miniboss" and ref.inst then
+			local d = (ref.inst.Position - beaconCF.Position).Magnitude
+			if d < 60 then
+				-- drain small continuous fuel while close
+				BeaconService.ApplyFuel(-2 * dt)
+			end
+		end
 	end
 end
