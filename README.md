@@ -23,3 +23,10 @@ Mobile-first co-op survive-the-night game on Roblox.
   - Toggle `FeatureFlags.softLaunch=false` in MemoryStore `Survive99_LiveConfig_v1/live`.
   - Push new thumbnails, description with seasonal hook.
   - Monitor Analytics: `soft_gate_blocked`, `purchase_result`, heartbeat p95.
+
+## Final Polish Tools
+- **Radial Build Menu**: Tap **Build** (bottom-left) → pick a piece → tap world to place.
+- **Performance Overlay**: Top-right shows **FPS** and **RTT** (round-trip to server).
+- **Credits**: Type `/credits` in chat to toggle. Edit text in `Shared/Config/Credits.lua`.
+- **Confetti Egg**: `/confetti` or `/egg` (client-only).
+- **Icon helpers**: `/icon`, `/thumbs`. **Ship check**: `/shipcheck`.
