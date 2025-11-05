@@ -7,6 +7,7 @@ local WavePlanner = require(Rep.Shared.WavePlanner)
 local AISpawner = require(game.ServerScriptService.Services.AISpawnerService)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local AtmosphereService = require(script.Parent.AtmosphereService)
+local OmenService = require(script.Parent.OmenService)
 
 local M = {}
 local state = { night = 0, phase = "Lobby", omen = nil }
@@ -40,6 +41,7 @@ end
 
 function M.startDay(world)
 	state.phase = "Day"; state.omen = nil
+	OmenService.Clear()
 	local RescueService = require(script.Parent.RescueService)
 	RescueService.GenerateDailyRescues()
 	BeaconService.OnDayStart()
@@ -53,6 +55,7 @@ function M.startNight(world)
 	end
 	state.phase = "Night"; state.night += 1
 	state.omen = rollOmen()
+	OmenService.Set(state.omen)
 	AtmosphereService.OnOmenStart(state.omen)
 	if state.omen then Net.PlaySound:FireAllClients("omen") end
 	BeaconService.OnNightStart()

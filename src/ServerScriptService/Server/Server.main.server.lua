@@ -31,10 +31,12 @@ local GameService = require(ServicesFolder.GameService)
 local DataService = require(ServicesFolder.DataService)
 local BeaconService = require(ServicesFolder.BeaconService)
 local TutorialService = require(ServicesFolder.TutorialService)
+local PatchNotes = require(ServicesFolder.PatchNotesService)
 
 game.Players.PlayerAdded:Connect(function(plr)
 	DataService.LoadProfileAsync(plr)
 	TutorialService.Begin(plr)
+	PatchNotes.PushIfNew(plr)
 end)
 game.Players.PlayerRemoving:Connect(function(plr) DataService.SaveProfileAsync(plr) end)
 

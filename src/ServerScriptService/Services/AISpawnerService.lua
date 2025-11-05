@@ -16,6 +16,7 @@ local Boss = require(Rep.Components.C_Boss)
 
 local AssetLoader = require(script.Parent.AssetLoader)
 local SpawnPoints = require(script.Parent.SpawnPointService)
+local OmenService = require(script.Parent.OmenService)
 
 local M = {}
 local active = 0
@@ -52,6 +53,9 @@ local function spawnOne(kind, position)
 	part.Destroying:Connect(function() active -= 1 end)
 
 	local speed = SPEED_BY_KIND[kind] or 12
+	if OmenService.Is("BloodMoon") then
+		speed = math.floor(speed * 1.15)
+	end
 	local dmg = DMG_BY_KIND[kind] or 6
 
 	local comps = {
