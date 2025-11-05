@@ -5,6 +5,8 @@ local BuildService = require(game.ServerScriptService.Services.BuildService)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local DataService = require(game.ServerScriptService.Services.DataService)
 local SettingsService = require(game.ServerScriptService.Services.SettingsService)
+local StoreService = require(game.ServerScriptService.Services.StoreService)
+local Analytics = require(game.ServerScriptService.Services.AnalyticsAdapter)
 
 Net.PlaceRequest.OnServerInvoke = function(player, placeType, cfTable)
 	if not Throttle.consume(player, "build", 1) then return false, "throttled" end
@@ -37,6 +39,28 @@ end
 
 Net.ToggleSetting.OnServerInvoke = function(player, category, key, value)
 	return SettingsService.Toggle(player, category, key, value)
+end
+
+-- PATCH: add purchase endpoints (optional)
+Net.ToggleSetting.OnServerInvoke = Net.ToggleSetting.OnServerInvoke -- keep
+
+if not Net.PurchaseProduct then
+	local Rep = game:GetService("ReplicatedStorage")
+	local Remotes = Rep:FindFirstChild("Remotes")
+	local rf = Instance.new("RemoteFunction"); rf.Name = "PurchaseProduct"; rf.Parent = Remotes
+	Net.PurchaseProduct = rf
+end
+
+Net.PurchaseProduct.OnServerInvoke = function(player, key)
+	Analytics.PurchaseAttempt(player, key)
+	local policy = StoreService.CanOffer(player)
+	if not policy.allowIAP then
+		Analytics.PurchaseResult(player, key, false)
+		return false, "iap_blocked"
+	end
+	local ok, err = StoreService.PurchaseDevProduct(player, key)
+	Analytics.PurchaseResult(player, key, ok and true or false)
+	return ok, err
 end
 
 local TutorialService = require(game.ServerScriptService.Services.TutorialService)

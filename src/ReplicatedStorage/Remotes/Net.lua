@@ -19,4 +19,5 @@ return {
 	TutorialEvent  = get("TutorialEvent","RemoteEvent"),
 	PlaySound     = get("PlaySound","RemoteEvent"),
 	ToggleSetting = get("ToggleSetting","RemoteFunction"),
+	PurchaseProduct = get("PurchaseProduct","RemoteFunction"),
 }
