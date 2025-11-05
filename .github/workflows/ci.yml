@@ -1,20 +1,39 @@
 name: CI
+
 on:
-  push: { branches: ["main"] }
-  pull_request: {}
+  push:
+    branches: ["main", "master", "develop", "cursor/setup-survival-game-core-systems-add9"]
+  pull_request:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
-      - name: Install tools
-        run: aftman install
-      - name: Install Wally packages
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Roblox tooling
+        uses: ok-nick/setup-rojo@v1
+        with:
+          rojo-version: 7.4.1
+
+      - name: Install dependencies
         run: |
-          curl -sL https://raw.githubusercontent.com/UpliftGames/wally/main/wally-linux-x86_64 -o wally
-          chmod +x wally
-          ./wally install
-      - name: Build place (rbxm)
-        run: rojo build --output dist.rbxm
+          if [ -f aftman.toml ]; then
+            curl -L https://github.com/LPGhatguy/aftman/releases/download/v0.2.8/aftman-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+            ./aftman self-install
+            ./aftman install
+          fi
+          if [ -f wally.toml ]; then
+            curl -L https://github.com/UpliftGames/wally/releases/download/v0.3.2/wally-linux.zip -o wally.zip
+            unzip -o wally.zip -d wally-bin
+            ./wally-bin/wally install
+          fi
+
+      - name: Rojo build
+        run: |
+          rojo build default.project.json --output out.rbxlx
+
+      - name: Lint placeholder
+        run: |
+          echo "No headless lint configured yet"
