@@ -26,7 +26,9 @@ end)
 task.spawn(function()
 	while true do
 		local t0 = os.clock()
-		local ok, tServer = pcall(function() return Net.PerfPing:InvokeServer(t0) end)
+		local ok, tServer = pcall(function()
+			return Net.PerfPing:InvokeServer({ tClient = t0 })
+		end)
 		local rtt = ok and math.floor((os.clock() - t0)*1000) or -1
 		label.Text = string.format("FPS %d  |  RTT %d ms", math.floor(fps+0.5), rtt)
 		task.wait(1)

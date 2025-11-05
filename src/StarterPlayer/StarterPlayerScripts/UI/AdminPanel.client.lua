@@ -7,7 +7,9 @@ local adminOk = false
 
 local function rpcCheck()
 	-- Piggyback by trying a no-op admin action
-	local ok, res = pcall(function() return Net.AdminAction:InvokeServer("_probe") end)
+	local ok, res = pcall(function()
+		return Net.AdminAction:InvokeServer({ action = "_probe" })
+	end)
 	-- If server rejects non-admin, we treat as false; otherwise panel shows
 	adminOk = ok and (res ~= false)
 end
@@ -49,22 +51,22 @@ end
 mkLabel(8, "Admin Panel")
 
 mkButton(36, "Spawn Miniboss", function()
-	Net.AdminAction:InvokeServer("spawn_miniboss")
+	Net.AdminAction:InvokeServer({ action = "spawn_miniboss" })
 end)
 mkButton(70, "Spawn Wave", function()
-	Net.AdminAction:InvokeServer("spawn_wave", {night=5})
+	Net.AdminAction:InvokeServer({ action = "spawn_wave", payload = { night = 5 } })
 end)
 mkButton(104, "+20 Fuel", function()
-	Net.AdminAction:InvokeServer("fuel_plus")
+	Net.AdminAction:InvokeServer({ action = "fuel_plus" })
 end)
 mkButton(138, "Blackout Beacon", function()
-	Net.AdminAction:InvokeServer("blackout")
+	Net.AdminAction:InvokeServer({ action = "blackout" })
 end)
 mkButton(172, "Give 50 Shards", function()
-	Net.AdminAction:InvokeServer("give_shards", {amount=50})
+	Net.AdminAction:InvokeServer({ action = "give_shards", payload = { amount = 50 } })
 end)
 mkButton(206, "Reset Tutorial", function()
-	Net.AdminAction:InvokeServer("reset_tutorial")
+	Net.AdminAction:InvokeServer({ action = "reset_tutorial" })
 end)
 
 -- Flags/Tuning quick toggles
@@ -74,7 +76,7 @@ toggle.Position = UDim2.new(0, 168, 0, 36)
 toggle.Text = "softLaunch OFF"
 toggle.Parent = frame
 toggle.MouseButton1Click:Connect(function()
-	Net.AdminSetConfig:InvokeServer("flag","softLaunch",false)
+	Net.AdminSetConfig:InvokeServer({ kind = "flag", key = "softLaunch", value = false })
 	toggle.Text = "softLaunch OFF"
 end)
 
@@ -84,6 +86,6 @@ tuning.Position = UDim2.new(0, 168, 0, 70)
 tuning.Text = "waveCap=80"
 tuning.Parent = frame
 tuning.MouseButton1Click:Connect(function()
-	Net.AdminSetConfig:InvokeServer("tuning","waveCap",100)
+	Net.AdminSetConfig:InvokeServer({ kind = "tuning", key = "waveCap", value = 100 })
 	tuning.Text = "waveCap=100"
 end)

@@ -10,6 +10,8 @@ local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local M = {}
 local state = { night = 0, phase = "Lobby", omen = nil }
 
+local worldRef = nil
+
 local function broadcast()
 	Net.BroadcastState:FireAllClients({
 		night = state.night,
@@ -29,11 +31,10 @@ local function rollOmen()
 end
 
 function M.start(world)
-	state.phase = "Day"; state.omen = nil
+	worldRef = world
+	state.phase = "Day"
+	state.omen = nil
 	broadcast()
-	Net.NightStartVote.OnServerEvent:Connect(function(_player)
-		if state.phase == "Day" then M.startNight(world) end
-	end)
 end
 
 function M.startDay(world)
@@ -45,6 +46,9 @@ function M.startDay(world)
 end
 
 function M.startNight(world)
+	if world then
+		worldRef = world
+	end
 	state.phase = "Night"; state.night += 1
 	state.omen = rollOmen()
 	if state.omen then Net.PlaySound:FireAllClients("omen") end
@@ -60,6 +64,14 @@ function M.startNight(world)
 			TutorialService.OnAction(plr, "start")
 		end
 	end)
+end
+
+function M.requestNightStart(_player)
+	if state.phase ~= "Day" then
+		return false, "not_day"
+	end
+	M.startNight(worldRef)
+	return true
 end
 
 return M

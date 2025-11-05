@@ -1,19 +1,8 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
-local Rep = game:GetService("ReplicatedStorage")
 local LiveConfig = require(script.Parent.LiveConfigService)
+local AdminGuard = require(game.ServerScriptService.Security.AdminGuard)
 
 local M = {}
--- FILL THIS with your Roblox user IDs (devs who can use Admin Panel)
-M.Admins = {
-	-- 12345678, -- you
-}
-
-local function isAdmin(userId: number)
-	for _, id in ipairs(M.Admins) do
-		if id == userId then return true end
-	end
-	return false
-end
 
 local function saveToMemoryStore()
 	local map = MemoryStoreService:GetMap("Survive99_LiveConfig_v1")
@@ -29,7 +18,7 @@ local function saveToMemoryStore()
 end
 
 function M.SetFlag(userId, key, value)
-	if not isAdmin(userId) then return false, "not_admin" end
+	if not AdminGuard.isUserIdAllowed(userId) then return false, "not_admin" end
 	LiveConfig.FeatureFlags[key] = value
 	saveToMemoryStore()
 	return true
@@ -47,12 +36,14 @@ local function setPath(tbl, path, value)
 end
 
 function M.SetTuning(userId, path, value)
-	if not isAdmin(userId) then return false, "not_admin" end
+	if not AdminGuard.isUserIdAllowed(userId) then return false, "not_admin" end
 	setPath(LiveConfig.Tuning, path, value)
 	saveToMemoryStore()
 	return true
 end
 
-function M.IsAdmin(userId) return isAdmin(userId) end
+function M.IsAdmin(userId)
+	return AdminGuard.isUserIdAllowed(userId)
+end
 
 return M

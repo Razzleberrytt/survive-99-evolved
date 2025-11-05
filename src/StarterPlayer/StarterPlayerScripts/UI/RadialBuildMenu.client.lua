@@ -82,7 +82,10 @@ UIS.InputBegan:Connect(function(input, gpe)
 		local pos = (input.UserInputType == Enum.UserInputType.Touch) and input.Position or UIS:GetMouseLocation()
 		local cf = screenTapToWorld(pos)
 		if cf then
-			local ok, result = Net.PlaceRequest:InvokeServer(current, {X=cf.X, Y=cf.Y, Z=cf.Z})
+			local ok, result = Net.PlaceRequest:InvokeServer({
+				placeType = current,
+				position = cf.Position,
+			})
 			if not ok then
 				title.Text = "Blocked: "..tostring(result)
 				VFX.spawnRingBurst(cf.Position, Color3.fromRGB(255,100,100), 0.6)

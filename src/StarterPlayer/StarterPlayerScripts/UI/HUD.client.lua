@@ -48,7 +48,7 @@ makeButton("StartNight", 12, "Start Night", function()
 end)
 
 makeButton("FuelPlus", 140, "+5 Fuel", function()
-	local ok, res = Net.FuelBeacon:InvokeServer(5)
+	local ok, res = Net.FuelBeacon:InvokeServer({ amount = 5 })
 end)
 
 local function label(x, y, w, h, name)
@@ -67,25 +67,25 @@ local lblCount = label(340, 12, 220, 28, "Count")
 
 makeButton("PlaceWall", 272, "Place Wall", function()
 	local cf = CFrame.new(workspace.CurrentCamera.CFrame.Position + workspace.CurrentCamera.CFrame.LookVector * 12)
-	local ok = Net.PlaceRequest:InvokeServer("Wall", {X=cf.X, Y=cf.Y, Z=cf.Z})
+	local ok = Net.PlaceRequest:InvokeServer({ placeType = "Wall", position = cf.Position })
 end)
 
 makeButton("PlaceSpike", 400, "Place Spike", function()
 	local cf = CFrame.new(workspace.CurrentCamera.CFrame.Position + workspace.CurrentCamera.CFrame.LookVector * 12)
-	local ok = Net.PlaceRequest:InvokeServer("TrapSpike", {X=cf.X, Y=cf.Y, Z=cf.Z})
+	local ok = Net.PlaceRequest:InvokeServer({ placeType = "TrapSpike", position = cf.Position })
 end)
 
 local btnEscort = makeButton("Escort", 528, "Escort", function()
-	Net.RescueInteract:InvokeServer("current", "Escort")
+	Net.RescueInteract:InvokeServer({ id = "current", action = "Escort" })
 end)
 
 local btnAcc = makeButton("Accessibility", 656, "Reduce Flashes", function()
-	local ok = Net.ToggleSetting:InvokeServer("accessibility", "reduceFlashes", true)
+	local ok = Net.ToggleSetting:InvokeServer({ category = "accessibility", key = "reduceFlashes", value = true })
 	setCaption("Reduce flashes: ON")
 end)
 
 local btnShop = makeButton("Shop", 780, "Shop", function()
-	local ok, res = Net.PurchaseProduct:InvokeServer("shards_100")
+	local ok, res = Net.PurchaseProduct:InvokeServer({ productKey = "shards_100" })
 	if not ok then setCaption("Shop unavailable: "..tostring(res)) else setCaption("Purchase prompt opened") end
 end)
 
