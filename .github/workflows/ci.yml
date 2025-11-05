@@ -1,0 +1,20 @@
+name: CI
+on:
+  push: { branches: ["main"] }
+  pull_request: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Aftman
+        uses: ok-nick/setup-aftman@v0.4.2
+      - name: Install tools
+        run: aftman install
+      - name: Install Wally packages
+        run: |
+          curl -sL https://raw.githubusercontent.com/UpliftGames/wally/main/wally-linux-x86_64 -o wally
+          chmod +x wally
+          ./wally install
+      - name: Build place (rbxm)
+        run: rojo build --output dist.rbxm
