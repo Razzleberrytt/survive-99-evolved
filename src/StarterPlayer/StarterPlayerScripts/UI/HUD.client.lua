@@ -36,6 +36,41 @@ makeButton("FuelPlus", 140, "+5 Fuel", function()
 	local ok, res = Net.FuelBeacon:InvokeServer(5)
 end)
 
+local function label(x, y, w, h, name)
+	local t = Instance.new("TextLabel")
+	t.Size = UDim2.new(0, w, 0, h)
+	t.Position = UDim2.new(0, x, 0, y)
+	t.TextXAlignment = Enum.TextXAlignment.Left
+	t.BackgroundTransparency = 0.3
+	t.Font = Enum.Font.Gotham
+	t.TextSize = 16
+	t.Parent = gui
+	return t
+end
+
+local lblCount = label(340, 12, 220, 28, "Count")
+
+makeButton("PlaceWall", 272, "Place Wall", function()
+	local cf = CFrame.new(workspace.CurrentCamera.CFrame.Position + workspace.CurrentCamera.CFrame.LookVector * 12)
+	local ok = Net.PlaceRequest:InvokeServer("Wall", {X=cf.X, Y=cf.Y, Z=cf.Z})
+end)
+
+makeButton("PlaceSpike", 400, "Place Spike", function()
+	local cf = CFrame.new(workspace.CurrentCamera.CFrame.Position + workspace.CurrentCamera.CFrame.LookVector * 12)
+	local ok = Net.PlaceRequest:InvokeServer("TrapSpike", {X=cf.X, Y=cf.Y, Z=cf.Z})
+end)
+
+-- Count updates when BroadcastState arrives (just refresh)
+local function refreshCount()
+	local n = 0
+	for _, p in ipairs(workspace:GetChildren()) do
+		if p:IsA("BasePart") and p.Name:match("^Enemy_") then n += 1 end
+	end
+	lblCount.Text = "Enemies: "..tostring(n)
+end
+
+game:GetService("RunService").RenderStepped:Connect(refreshCount)
+
 local night, phase, omen = 0, "Lobby", ""
 local function draw()
 	lblTop.Text = string.format("Night %d  |  Phase %s", night, phase)
