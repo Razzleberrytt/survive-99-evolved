@@ -6,7 +6,8 @@ local Target = require(Rep.Components.C_Target)
 local PathComp = require(Rep.Components.C_Path)
 
 local AGENT_PARAMS = {
-	AgentRadius = 2, AgentHeight = 5, AgentCanJump = true
+	AgentRadius = 2, AgentHeight = 5, AgentCanJump = true,
+	Costs = { HighCost = 2.0 }
 }
 
 local function computePath(from, to)

@@ -20,8 +20,9 @@ local systemFns = {
 	require(Systems.S_Cleanup),
 }
 
--- Services
 local ServicesFolder = script.Parent.Parent:WaitForChild("Services")
+local NavVolumeService = require(ServicesFolder.NavVolumeService)
+NavVolumeService.Bootstrap()
 local LiveConfig = require(ServicesFolder.LiveConfigService)
 LiveConfig.Start()
 local BugReport = require(ServicesFolder.BugReportService)
