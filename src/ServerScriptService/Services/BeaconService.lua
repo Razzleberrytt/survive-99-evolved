@@ -51,7 +51,9 @@ end
 
 function M.OnNightStart()
 	state.fuel = clamp(state.fuel - C.Beacon.FuelDrainPerNight, 0, 100)
+	Net.PlaySound:FireAllClients("beacon_on")
 	if state.fuel <= 0 then
+		Net.PlaySound:FireAllClients("beacon_off")
 		warn("[Beacon] Blackout!")
 		Net.BroadcastState:FireAllClients({ blackout = true })
 	end

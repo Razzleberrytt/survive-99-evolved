@@ -26,6 +26,7 @@ return function(world, dt)
 					eref.inst.AssemblyLinearVelocity += dir * 24
 					t.trap.cooldown = 2
 					Net.SpawnVFX:FireAllClients({ kind="text", part = eref.inst, text = "SPIKED!" })
+					Net.PlaySound:FireAllClients("spike")
 				elseif t.trap.kind == "Slow" and d < 10 then
 					mot.speed = math.max(6, mot.speed * 0.6)
 				end

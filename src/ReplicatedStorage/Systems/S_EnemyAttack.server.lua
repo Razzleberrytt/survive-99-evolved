@@ -32,6 +32,7 @@ return function(world, dt)
 			atk.cd = atk.cooldown
 			-- VFX
 			Net.SpawnVFX:FireAllClients({ kind = "damage", part = nearestInst, amount = atk.damage })
+			Net.PlaySound:FireAllClients("hit")
 
 			if nearest.hpC.hp <= 0 then
 				if nearestInst and nearestInst.Parent then nearestInst:Destroy() end

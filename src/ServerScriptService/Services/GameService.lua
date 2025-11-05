@@ -47,6 +47,7 @@ end
 function M.startNight(world)
 	state.phase = "Night"; state.night += 1
 	state.omen = rollOmen()
+	if state.omen then Net.PlaySound:FireAllClients("omen") end
 	BeaconService.OnNightStart()
 	local plan = WavePlanner(state.night, #Players:GetPlayers(), state.omen)
 	-- Simple miniboss flag on milestone nights
