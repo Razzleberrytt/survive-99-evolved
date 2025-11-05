@@ -21,6 +21,5 @@ return {
 	ToggleSetting = get("ToggleSetting","RemoteFunction"),
 	PurchaseProduct = get("PurchaseProduct","RemoteFunction"),
 	PerfPing      = get("PerfPing","RemoteFunction"),
-	AdminAction   = get("AdminAction","RemoteFunction"),
-	AdminSetConfig= get("AdminSetConfig","RemoteFunction"),
+	Admin_Perform = get("Admin_Perform","RemoteFunction"),
 }

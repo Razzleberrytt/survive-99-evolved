@@ -1,32 +1,48 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Admins = require(game.ReplicatedStorage.Shared.Config.Admins)
 
-local AdminConfig = require(ReplicatedStorage.Shared.Config.Admins)
-
-local allowSet: { [number]: boolean } = {}
-for _, userId in ipairs(AdminConfig.Allowlist or {}) do
-  allowSet[userId] = true
+local ALLOW = {}
+for _, id in ipairs(Admins.Allowlist or {}) do
+  if type(id) == "number" then
+    ALLOW[id] = true
+  end
 end
 
-local AdminGuard = {}
-
-function AdminGuard.isUserIdAllowed(userId: number?): boolean
+local function inGroup(userId: number?)
   if type(userId) ~= "number" then
     return false
   end
-  return allowSet[userId] == true
+  local groupConfig = Admins.Group
+  if groupConfig and groupConfig.GroupId and groupConfig.GroupId > 0 then
+    local ok, rank = pcall(function()
+      return Players:GetRankInGroupAsync(userId, groupConfig.GroupId)
+    end)
+    if ok and rank and rank >= (groupConfig.MinRank or 255) then
+      return true
+    end
+  end
+  return false
 end
 
-function AdminGuard.isPlayerAllowed(player: Player?): boolean
-  if player == nil then
+return function(subject)
+  local userId
+  if typeof(subject) == "Instance" then
+    userId = subject.UserId
+  else
+    userId = subject
+  end
+
+  if type(userId) ~= "number" then
     return false
   end
-  return AdminGuard.isUserIdAllowed(player.UserId)
+
+  if ALLOW[userId] then
+    return true
+  end
+
+  if inGroup(userId) then
+    return true
+  end
+
+  return false
 end
-
-setmetatable(AdminGuard, {
-  __call = function(_, player: Player)
-    return AdminGuard.isPlayerAllowed(player)
-  end,
-})
-
-return AdminGuard

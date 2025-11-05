@@ -2,10 +2,7 @@ local Rep = game:GetService("ReplicatedStorage")
 
 local Remotes = require(game.ServerScriptService.Net.Remotes)
 local Validators = require(Rep.Shared.Net.Validators)
-local AdminGuard = require(game.ServerScriptService.Security.AdminGuard)
 local Throttle = require(script.Parent.Throttle)
-local LiveConfigAdmin = require(game.ServerScriptService.Services.LiveConfigAdmin)
-local AISpawner = require(game.ServerScriptService.Services.AISpawnerService)
 local BuildService = require(game.ServerScriptService.Services.BuildService)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local DataService = require(game.ServerScriptService.Services.DataService)
@@ -157,69 +154,4 @@ Remotes.registerFunction(
 		return ok, err
 	end,
 	{ capacity = 4, refill = 0.5 }
-)
-
-local function adminDenied()
-	return false, "not_admin"
-end
-
-Remotes.registerFunction(
-	"AdminAction",
-	Validators.shape({
-		action = Validators.string,
-		payload = Validators.optional(Validators.table),
-	}),
-	function(player, payload)
-		local action = payload.action
-		local actionPayload = payload.payload or {}
-		if action == "_probe" then
-			return true
-		elseif action == "spawn_miniboss" then
-			AISpawner.spawn({ budget = 1, squads = { { type = "Miniboss", count = 1 } } })
-			return true
-		elseif action == "spawn_wave" then
-			AISpawner.spawn({ budget = 99, squads = { { type = "Forager", count = 6 }, { type = "Bruiser", count = 3 } } })
-			return true
-		elseif action == "fuel_plus" then
-			BeaconService.ApplyFuel(20)
-			return true
-		elseif action == "blackout" then
-			BeaconService.ApplyFuel(-200)
-			return true
-		elseif action == "give_shards" then
-			local amount = 50
-			if type(actionPayload.amount) == "number" then
-				amount = math.clamp(actionPayload.amount, 0, 10_000)
-			end
-			DataService.AddShards(player, amount)
-			return true
-		elseif action == "reset_tutorial" then
-			local profile = DataService.GetProfileSnapshot(player) or DataService.LoadProfileAsync(player)
-			if profile then
-				profile.tutorialComplete = nil
-			end
-			TutorialService.Begin(player)
-			return true
-		end
-		return false, "unknown_action"
-	end,
-	{ permission = AdminGuard, onDenied = adminDenied, capacity = 4, refill = 0.5 }
-)
-
-Remotes.registerFunction(
-	"AdminSetConfig",
-	Validators.shape({
-		kind = Validators.string,
-		key = Validators.string,
-		value = Validators.optional(Validators.any),
-	}),
-	function(player, payload)
-		if payload.kind == "flag" then
-			return LiveConfigAdmin.SetFlag(player.UserId, payload.key, payload.value)
-		elseif payload.kind == "tuning" then
-			return LiveConfigAdmin.SetTuning(player.UserId, payload.key, payload.value)
-		end
-		return false, "bad_kind"
-	end,
-	{ permission = AdminGuard, onDenied = adminDenied, capacity = 3, refill = 0.5 }
 )

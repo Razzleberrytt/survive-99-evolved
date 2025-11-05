@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Remotes = require(script.Parent.Remotes)
 local Validators = require(ReplicatedStorage.Shared.Net.Validators)
-local AdminGuard = require(game.ServerScriptService.Security.AdminGuard)
 
 Remotes.registerEvent(
   "ReportHit",
@@ -20,11 +19,3 @@ Remotes.registerEvent(
   { capacity = 12, refill = 3 }
 )
 
-Remotes.registerEvent(
-  "Admin_ToggleDoubleXP",
-  Validators.shape({ enabled = Validators.boolean }),
-  function(_player, payload)
-    -- LiveConfigService.SetFlag("doubleXP", payload.enabled)
-  end,
-  { permission = AdminGuard, capacity = 4, refill = 0.5 }
-)

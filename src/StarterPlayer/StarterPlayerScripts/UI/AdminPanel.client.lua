@@ -2,6 +2,10 @@ local Players = game:GetService("Players")
 local Rep = game:GetService("ReplicatedStorage")
 local Net = require(Rep.Remotes.Net)
 
+if not Net.AdminAction or not Net.AdminSetConfig then
+  return
+end
+
 -- Show only if you are whitelisted on server (admins list)
 local adminOk = false
 
