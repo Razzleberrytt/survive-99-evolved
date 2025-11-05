@@ -1,0 +1,14 @@
+# Roblox/Lua .gitignore
+
+*.rbxl
+*.rbxm
+*.lua
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Ignore local plugins/build files
+/plugins/*
+/build/
