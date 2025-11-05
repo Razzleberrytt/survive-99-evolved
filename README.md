@@ -30,3 +30,12 @@ Mobile-first co-op survive-the-night game on Roblox.
 - **Credits**: Type `/credits` in chat to toggle. Edit text in `Shared/Config/Credits.lua`.
 - **Confetti Egg**: `/confetti` or `/egg` (client-only).
 - **Icon helpers**: `/icon`, `/thumbs`. **Ship check**: `/shipcheck`.
+
+## Admin & Release Tools
+- **Admin Panel (dev-only)**: Add your userId in `Services/LiveConfigAdmin.lua`. In Play, panel appears (top-right). You can:
+  - Toggle `softLaunch` OFF
+  - Set tuning like `waveCap` to 100
+  - Spawn wave/miniboss, add fuel, blackout, grant shards, reset tutorial
+- **Icon Scene**: Type `/iconscene`, then `/iconA`, `/iconB`, `/iconC` to frame shots. Use Studio Screenshot.
+- **Release Commands**: `/shipcheck` (readiness), `/release` (final checklist).
+- **LiveConfig**: Server writes overrides to MemoryStore key `Survive99_LiveConfig_v1/live`.
