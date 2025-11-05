@@ -38,6 +38,8 @@ end
 
 function M.startDay(world)
 	state.phase = "Day"; state.omen = nil
+	local RescueService = require(script.Parent.RescueService)
+	RescueService.GenerateDailyRescues()
 	BeaconService.OnDayStart()
 	broadcast()
 end
