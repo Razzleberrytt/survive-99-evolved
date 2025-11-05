@@ -53,6 +53,12 @@ function M.startNight(world)
 	if state.night % 5 == 0 then table.insert(plan.squads, {type="Miniboss", count=1}) end
 	AISpawner.spawn(plan)
 	broadcast()
+	pcall(function()
+		local TutorialService = require(script.Parent.TutorialService)
+		for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
+			TutorialService.OnAction(plr, "start")
+		end
+	end)
 end
 
 return M

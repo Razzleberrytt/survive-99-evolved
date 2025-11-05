@@ -11,7 +11,10 @@ return {
 	RepairRequest  = get("RepairRequest","RemoteFunction"),
 	FuelBeacon     = get("FuelBeacon","RemoteFunction"),
 	RescueInteract = get("RescueInteract","RemoteFunction"),
+	GetProfile     = get("GetProfile","RemoteFunction"),
 	NightStartVote = get("NightStartVote","RemoteEvent"),
 	BroadcastState = get("BroadcastState","RemoteEvent"),
 	BeaconChanged  = get("BeaconChanged","RemoteEvent"),
+	SpawnVFX       = get("SpawnVFX","RemoteEvent"),
+	TutorialEvent  = get("TutorialEvent","RemoteEvent"),
 }

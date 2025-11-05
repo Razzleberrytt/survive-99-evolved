@@ -4,6 +4,7 @@ local Trap = require(Rep.Components.C_Trap)
 local InstanceRef = require(Rep.Components.C_InstanceRef)
 local EnemyType = require(Rep.Components.C_EnemyType)
 local Motion = require(Rep.Components.C_Motion)
+local Net = require(Rep.Remotes.Net)
 
 -- Simple spatial scan (O(n*m) is fine for MVP scale)
 
@@ -24,6 +25,7 @@ return function(world, dt)
 					local dir = (eref.inst.Position - t.inst.Position).Unit
 					eref.inst.AssemblyLinearVelocity += dir * 24
 					t.trap.cooldown = 2
+					Net.SpawnVFX:FireAllClients({ kind="text", part = eref.inst, text = "SPIKED!" })
 				elseif t.trap.kind == "Slow" and d < 10 then
 					mot.speed = math.max(6, mot.speed * 0.6)
 				end

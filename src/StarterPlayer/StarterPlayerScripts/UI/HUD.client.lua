@@ -76,6 +76,13 @@ end)
 local shardCount = 0
 local function setShards(n) shardCount = n; lblShards.Text = "Shards: "..tostring(shardCount) end
 setShards(0)
+task.spawn(function()
+	while true do
+		task.wait(5)
+		local prof = Net.GetProfile:InvokeServer()
+		if prof and prof.currencies then setShards(prof.currencies.shards or 0) end
+	end
+end)
 
 -- Count updates when BroadcastState arrives (just refresh)
 local function refreshCount()

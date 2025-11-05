@@ -5,34 +5,37 @@ local Attack = require(Rep.Components.C_Attack)
 local EnemyType = require(Rep.Components.C_EnemyType)
 local Health = require(Rep.Components.C_Health)
 local Buildable = require(Rep.Components.C_Buildable)
+local Net = require(Rep.Remotes.Net)
 
--- Simple shared storage for structure instances -> health component
-local structureRefs = {}
+local structureRefs = {} -- [BasePart] = { id, hpC }
 
 return function(world, dt)
-	-- Rebuild a small map of structure instances (one pass)
+	-- Map structures
 	structureRefs = {}
 	for sid, bref, bhp, b in world:query(InstanceRef, Health, Buildable) do
-		if bref.inst then structureRefs[bref.inst] = { id = sid, hp = bhp } end
+		if bref.inst then structureRefs[bref.inst] = { id = sid, hpC = bhp } end
 	end
 
 	for id, ref, atk, et in world:query(InstanceRef, Attack, EnemyType) do
 		if atk.cd > 0 then atk.cd -= dt end
 		local inst = ref.inst
 		if not inst then continue end
-		-- Look for nearest structure within radius
-		local nearest, dist = nil, atk.radius + 0.01
+
+		local nearest, nearestInst, dist = nil, nil, atk.radius + 0.01
 		for sInst, data in pairs(structureRefs) do
 			local d = (sInst.Position - inst.Position).Magnitude
-			if d < dist then nearest, dist = data, d end
+			if d < dist then nearest, nearestInst, dist = data, sInst, d end
 		end
+
 		if nearest and atk.cd <= 0 then
-			nearest.hp.hp = math.max(0, nearest.hp.hp - atk.damage)
+			nearest.hpC.hp = math.max(0, nearest.hpC.hp - atk.damage)
 			atk.cd = atk.cooldown
-			if nearest.hp.hp <= 0 then
-				-- Despawn structure entity (server cleans up instance)
+			-- VFX
+			Net.SpawnVFX:FireAllClients({ kind = "damage", part = nearestInst, amount = atk.damage })
+
+			if nearest.hpC.hp <= 0 then
+				if nearestInst and nearestInst.Parent then nearestInst:Destroy() end
 				world:despawn(nearest.id)
-				if sInst and sInst.Parent then sInst:Destroy() end
 			end
 		end
 	end
