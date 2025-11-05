@@ -1,0 +1,1 @@
+This folder will contain your Roblox game assets, such as images, sounds, scripts, and maps for Survive 99 Evolved.
