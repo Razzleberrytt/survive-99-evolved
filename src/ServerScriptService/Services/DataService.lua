@@ -12,6 +12,9 @@ local TEMPLATE = {
 	cosmetics = { outfits = {}, emotes = {}, campThemes = {} },
 	beaconModsOwned = {},
 	settings = { accessibility = { captions = true, reduceFlashes = true }, input = { stickLayout = "default" } },
+	equippedCamp = nil,
+	equippedOutfit = nil,
+	lastSeenVersion = nil,
 }
 
 local function migrate(p)
@@ -20,6 +23,14 @@ local function migrate(p)
 		-- future fields here
 		p._schema = 1
 	end
+	p.equippedCamp = p.equippedCamp or nil
+	p.equippedOutfit = p.equippedOutfit or nil
+	p.lastSeenVersion = p.lastSeenVersion or nil
+	p.cosmetics = p.cosmetics or { outfits = {}, emotes = {}, campThemes = {} }
+	p.cosmetics.outfits = p.cosmetics.outfits or {}
+	p.cosmetics.campThemes = p.cosmetics.campThemes or {}
+	p.cosmetics.emotes = p.cosmetics.emotes or {}
+	p.currencies = p.currencies or { shards = 0 }
 	return p
 end
 

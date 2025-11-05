@@ -1,6 +1,7 @@
 local Rep = game:GetService("ReplicatedStorage")
 
 local Remotes = require(game.ServerScriptService.Net.Remotes)
+local Net = require(Rep.Remotes.Net)
 local Validators = require(Rep.Shared.Net.Validators)
 local AdminGuard = require(game.ServerScriptService.Security.AdminGuard)
 local Throttle = require(script.Parent.Throttle)
@@ -15,6 +16,7 @@ local Analytics = require(game.ServerScriptService.Services.AnalyticsAdapter)
 local TutorialService = require(game.ServerScriptService.Services.TutorialService)
 local GameService = require(game.ServerScriptService.Services.GameService)
 local RescueService = require(game.ServerScriptService.Services.RescueService)
+local Cosmetics = require(game.ServerScriptService.Services.CosmeticsService)
 
 local function throttleDenied()
 	return false, "throttled"
@@ -119,6 +121,20 @@ Remotes.registerFunction(
 	end,
 	{ capacity = 4, refill = 0.5 }
 )
+
+Net.ListCosmetics.OnServerInvoke = function(player)
+	return Cosmetics.GetShop(player)
+end
+
+Net.BuyCosmetic.OnServerInvoke = function(player, id)
+	local ok, why = Cosmetics.Buy(player, id)
+	return ok, why
+end
+
+Net.EquipCosmetic.OnServerInvoke = function(player, id)
+	local ok, why = Cosmetics.Equip(player, id)
+	return ok, why
+end
 
 Remotes.registerFunction(
 	"PerfPing",

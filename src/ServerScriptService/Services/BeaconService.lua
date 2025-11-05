@@ -1,6 +1,8 @@
 local Rep = game:GetService("ReplicatedStorage")
 local Net = require(Rep.Remotes.Net)
 local C = require(Rep.Shared.Constants)
+local Tuning = require(Rep.Shared.Config.Tuning)
+local OmenService = require(script.Parent.OmenService)
 
 local M = {}
 local state = { fuel = 100, heat = 100, lightRadius = 90, stability = 1, mods = {} }
@@ -50,7 +52,12 @@ function M.OnDayStart()
 end
 
 function M.OnNightStart()
-	state.fuel = clamp(state.fuel - C.Beacon.FuelDrainPerNight, 0, 100)
+  local extra = 0
+  if OmenService.Is("BloodMoon") then
+    local O = (Tuning.get().Omen and Tuning.get().Omen.BloodMoon) or { extraFuel = 2 }
+    extra = O.extraFuel or 2
+  end
+  state.fuel = clamp(state.fuel - (C.Beacon.FuelDrainPerNight + extra), 0, 100)
 	Net.SpawnVFX:FireAllClients({ kind="particle", position = M.GetCFrame().Position })
 	Net.PlaySound:FireAllClients("beacon_on")
 	if state.fuel <= 0 then

@@ -14,6 +14,10 @@ local function apply(presetName, omen)
   for k,v in pairs(P.Lighting) do Lighting[k] = v end
   -- Atmosphere
   for k,v in pairs(P.Atmosphere) do atmosphere[k] = v end
+  if omen == "BloodMoon" then
+    atmosphere.Color = Color3.fromRGB(255, 120, 120)
+    atmosphere.Decay = Color3.fromRGB(120, 20, 20)
+  end
   -- Omen adjustments (subtle)
   if omen == "Fog" then atmosphere.Density = atmosphere.Density + 0.15 end
   if omen == "Eclipse" then Lighting.ClockTime = 0; cc.Brightness = cc.Brightness - 0.15 end

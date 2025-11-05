@@ -23,4 +23,8 @@ return {
 	PerfPing      = get("PerfPing","RemoteFunction"),
 	AdminAction   = get("AdminAction","RemoteFunction"),
 	AdminSetConfig= get("AdminSetConfig","RemoteFunction"),
+	ListCosmetics = get("ListCosmetics","RemoteFunction"),
+	BuyCosmetic   = get("BuyCosmetic","RemoteFunction"),
+	EquipCosmetic = get("EquipCosmetic","RemoteFunction"),
+	PatchNotesEvt = get("PatchNotesEvt","RemoteEvent"),
 }

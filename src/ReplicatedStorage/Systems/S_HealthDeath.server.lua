@@ -7,6 +7,9 @@ local Loot = require(Rep.Components.C_Loot)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local DataService = require(game.ServerScriptService.Services.DataService)
 local Net = require(Rep.Remotes.Net)
+local OmenService = require(game.ServerScriptService.Services.OmenService)
+local AISpawner = require(game.ServerScriptService.Services.AISpawnerService)
+local Tuning = require(Rep.Shared.Config.Tuning)
 
 return function(world, dt)
 	for id, hp, ref, et in world:query(Health, InstanceRef, EnemyType) do
@@ -27,6 +30,14 @@ return function(world, dt)
 				end
 			end
 			Net.SpawnVFX:FireAllClients({ kind="text", part = ref.inst, text = "+Shards" })
+			local function trySplit()
+				if not OmenService.Is("BloodMoon") then return end
+				local O = (Tuning.get().Omen and Tuning.get().Omen.BloodMoon) or { splitChance = 0.15 }
+				if math.random() < (O.splitChance or 0.15) and ref and ref.inst then
+					AISpawner.spawn({ budget=1, squads={{ type="Swarmling", count=1 }} })
+				end
+			end
+			trySplit()
 			-- Cleanup
 			if ref.inst and ref.inst.Parent then ref.inst:Destroy() end
 			world:despawn(id)
