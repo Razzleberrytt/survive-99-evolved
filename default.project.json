@@ -1,0 +1,29 @@
+{
+  "$schema": "https://rojo.space/schema/project.json",
+  "name": "survive-99-evolved",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Packages": { "$path": "Packages" },
+      "Remotes": { "$path": "src/ReplicatedStorage/Remotes" },
+      "Components": { "$path": "src/ReplicatedStorage/Components" },
+      "Systems": { "$path": "src/ReplicatedStorage/Systems" },
+      "Shared": { "$path": "src/ReplicatedStorage/Shared" },
+      "Tests": { "$path": "test" }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "Server": { "$path": "src/ServerScriptService/Server" },
+      "Services": { "$path": "src/ServerScriptService/Services" },
+      "Actors": { "$path": "src/ServerScriptService/Actors" }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Client": { "$path": "src/StarterPlayer/StarterPlayerScripts" }
+      }
+    }
+  }
+}
