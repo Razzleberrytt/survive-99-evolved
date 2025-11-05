@@ -1,32 +1,7 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local AdminConfig = require(ReplicatedStorage.Shared.Config.Admins)
-
-local allowSet: { [number]: boolean } = {}
-for _, userId in ipairs(AdminConfig.Allowlist or {}) do
-  allowSet[userId] = true
+local Admins = require(game.ReplicatedStorage.Shared.Config.Admins)
+local ALLOW = {}
+for _, id in ipairs(Admins.Allowlist) do ALLOW[id] = true end
+return function(subject)
+  local userId = typeof(subject) == "Instance" and subject.UserId or subject
+  return ALLOW[userId] == true
 end
-
-local AdminGuard = {}
-
-function AdminGuard.isUserIdAllowed(userId: number?): boolean
-  if type(userId) ~= "number" then
-    return false
-  end
-  return allowSet[userId] == true
-end
-
-function AdminGuard.isPlayerAllowed(player: Player?): boolean
-  if player == nil then
-    return false
-  end
-  return AdminGuard.isUserIdAllowed(player.UserId)
-end
-
-setmetatable(AdminGuard, {
-  __call = function(_, player: Player)
-    return AdminGuard.isPlayerAllowed(player)
-  end,
-})
-
-return AdminGuard

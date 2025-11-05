@@ -20,11 +20,3 @@ Remotes.registerEvent(
   { capacity = 12, refill = 3 }
 )
 
-Remotes.registerEvent(
-  "Admin_ToggleDoubleXP",
-  Validators.shape({ enabled = Validators.boolean }),
-  function(_player, payload)
-    -- LiveConfigService.SetFlag("doubleXP", payload.enabled)
-  end,
-  { permission = AdminGuard, capacity = 4, refill = 0.5 }
-)

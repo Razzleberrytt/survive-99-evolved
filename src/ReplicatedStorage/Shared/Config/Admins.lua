@@ -1,5 +1,6 @@
 return {
+  -- Keep it simple: allowlist only. You can add group gating later.
   Allowlist = {
-    -- Example: 12345678,
+    -- e.g., 12345678,
   },
 }
