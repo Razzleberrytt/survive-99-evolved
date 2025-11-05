@@ -24,14 +24,16 @@ local function inGroup(userId: number?)
   return false
 end
 
-return function(subject)
-  local userId
+local function resolveUserId(subject): number?
   if typeof(subject) == "Instance" then
-    userId = subject.UserId
-  else
-    userId = subject
+    return subject.UserId
   end
+  return subject
+end
 
+local AdminGuard = {}
+
+function AdminGuard.isUserIdAllowed(userId: number?)
   if type(userId) ~= "number" then
     return false
   end
@@ -46,3 +48,18 @@ return function(subject)
 
   return false
 end
+
+function AdminGuard.isPlayerAllowed(player: Player?)
+  if player == nil then
+    return false
+  end
+  return AdminGuard.isUserIdAllowed(player.UserId)
+end
+
+setmetatable(AdminGuard, {
+  __call = function(_, subject)
+    return AdminGuard.isUserIdAllowed(resolveUserId(subject))
+  end,
+})
+
+return AdminGuard
