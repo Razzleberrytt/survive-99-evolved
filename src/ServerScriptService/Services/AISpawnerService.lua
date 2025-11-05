@@ -15,6 +15,7 @@ local Loot = require(Rep.Components.C_Loot)
 local Boss = require(Rep.Components.C_Boss)
 
 local AssetLoader = require(script.Parent.AssetLoader)
+local SpawnPoints = require(script.Parent.SpawnPointService)
 
 local M = {}
 local active = 0
@@ -70,14 +71,13 @@ local function spawnOne(kind, position)
 end
 
 function M.spawn(plan)
-	local origin = Vector3.new(0,0,0)
 	for _, s in ipairs(plan.squads) do
 		for i = 1, s.count do
 			if active >= C.MaxNPCs then return end
-			local r = math.random(90, 150)
-			local theta = math.random() * math.pi * 2
-			local pos = origin + Vector3.new(math.cos(theta)*r, 0, math.sin(theta)*r)
-			spawnOne(s.type, pos)
+			if active >= (require(Rep.Shared.Config.Tuning).get().Wave.cap or 80) then return end
+			local cf = SpawnPoints.GetValidatedSpawn(80)
+			spawnOne(s.type, cf.Position)
+			-- balance hook already present
 		end
 	end
 end

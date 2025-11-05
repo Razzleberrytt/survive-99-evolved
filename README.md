@@ -56,3 +56,15 @@ Mobile-first co-op survive-the-night game on Roblox.
   - `/mood Eerie|Dusk|Clear` — cycle local preset (server pushes on night/day).
   - `/preset` — print current preset.
 - Performance tips: keep texture resolutions modest (≤1024), avoid >100 active point lights, ensure enemy models have a single PrimaryPart.
+
+## Spawn Points & Nav Volumes
+- **Spawn Points** live under `Workspace/SpawnPoints` (Parts tagged `EnemySpawn`). We auto-generate a 24-point ring if empty. Move/add/delete markers to control where enemies come from.
+- **Nav Volumes** live under `Workspace/NavVolumes`. Set a Part’s attribute `Nav="Block"` to forbid navmesh through it, or `Nav="HighCost"` to allow but discourage. We automatically attach `PathfindingModifier`s.
+- **Costs**: `HighCost` has cost **2.0** (see `S_PathfindAI`). Tweak as needed.
+- **Tools**:
+  - `/navviz` — toggle gizmos for spawn points (spheres) and nav volumes (boxes).
+  - `/genspawns` — Studio convenience: rebuild default ring (deletes & recreates SpawnPoints).
+
+## Spawner Logic
+- Spawner asks `SpawnPointService.GetValidatedSpawn(minLen)` for a point whose path length to the Beacon exceeds `minLen` (default 80 studs) so enemies don’t pop right at the base.
+- Pathfinding respects `HighCost` areas and avoids `Block` volumes.
