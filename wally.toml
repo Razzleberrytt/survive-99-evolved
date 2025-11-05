@@ -6,7 +6,7 @@ realm = "shared"
 
 [dependencies]
 matter = "matter-ecs/matter@0.8.4"
-plasma = "matter-ecs/plasma@0.4.4" # dev-only UI/debug
+plasma = "matter-ecs/plasma@0.4.4" # debugger UI (dev only)
 promise = "evaera/promise@4.0.0"
 signal = "sleitnick/signal@2.0.3"
 janitor = "howmanysmall/janitor@1.18.3"
