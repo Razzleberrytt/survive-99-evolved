@@ -24,8 +24,12 @@ local ServicesFolder = script.Parent.Parent:WaitForChild("Services")
 local GameService = require(ServicesFolder.GameService)
 local DataService = require(ServicesFolder.DataService)
 local BeaconService = require(ServicesFolder.BeaconService)
+local TutorialService = require(ServicesFolder.TutorialService)
 
-game.Players.PlayerAdded:Connect(function(plr) DataService.LoadProfileAsync(plr) end)
+game.Players.PlayerAdded:Connect(function(plr)
+	DataService.LoadProfileAsync(plr)
+	TutorialService.Begin(plr)
+end)
 game.Players.PlayerRemoving:Connect(function(plr) DataService.SaveProfileAsync(plr) end)
 
 GameService.start(World)

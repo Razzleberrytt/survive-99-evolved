@@ -6,6 +6,7 @@ local EnemyType = require(Rep.Components.C_EnemyType)
 local Loot = require(Rep.Components.C_Loot)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local DataService = require(game.ServerScriptService.Services.DataService)
+local Net = require(Rep.Remotes.Net)
 
 return function(world, dt)
 	for id, hp, ref, et in world:query(Health, InstanceRef, EnemyType) do
@@ -25,6 +26,7 @@ return function(world, dt)
 					DataService.AddShards(plr, shardAmt)
 				end
 			end
+			Net.SpawnVFX:FireAllClients({ kind="text", part = ref.inst, text = "+Shards" })
 			-- Cleanup
 			if ref.inst and ref.inst.Parent then ref.inst:Destroy() end
 			world:despawn(id)
