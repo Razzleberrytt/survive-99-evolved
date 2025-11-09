@@ -1,28 +1,78 @@
 {
-  "$schema": "https://rojo.space/schema/project.json",
-  "name": "survive-99-evolved",
+  "name": "Survive-99-Evolved",
+  "servePort": 34872,
   "tree": {
-    "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
-      "Packages": { "$path": "Packages" },
-      "Remotes": { "$path": "src/ReplicatedStorage/Remotes" },
-      "Components": { "$path": "src/ReplicatedStorage/Components" },
-      "Systems": { "$path": "src/ReplicatedStorage/Systems" },
-      "Shared": { "$path": "src/ReplicatedStorage/Shared" },
-      "Tests": { "$path": "test" }
+      "tree": {
+        "Shared": {
+          "$className": "Folder",
+          "tree": {
+            "Net": {
+              "$path": "Shared/Net"
+            },
+            "Config": {
+              "$path": "Shared/Config"
+            },
+            "Types": {
+              "$path": "Shared/Types"
+            }
+          }
+        },
+        "Tests": {
+          "$path": "Tests"
+        }
+      }
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "Server": { "$path": "src/ServerScriptService/Server" },
-      "Services": { "$path": "src/ServerScriptService/Services" },
-      "Actors": { "$path": "src/ServerScriptService/Actors" }
+      "tree": {
+        "Server": {
+          "$className": "Folder",
+          "tree": {
+            "Services": {
+              "$path": "Server/Services"
+            },
+            "Systems": {
+              "$path": "Server/Systems"
+            },
+            "init.server.lua": {
+              "$path": "Server/init.server.lua"
+            },
+            "Net": {
+              "$className": "Folder",
+              "tree": {
+                "RateLimiter.lua": {
+                  "$path": "Server/Net/RateLimiter.lua"
+                },
+                "Validator.lua": {
+                  "$path": "Server/Net/Validator.lua"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
-      "StarterPlayerScripts": {
-        "$className": "StarterPlayerScripts",
-        "Client": { "$path": "src/StarterPlayer/StarterPlayerScripts" }
+      "tree": {
+        "StarterPlayerScripts": {
+          "$className": "StarterPlayerScripts",
+          "tree": {
+            "Client": {
+              "$className": "Folder",
+              "tree": {
+                "Systems": {
+                  "$path": "Client/Systems"
+                },
+                "init.client.lua": {
+                  "$path": "Client/init.client.lua"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
