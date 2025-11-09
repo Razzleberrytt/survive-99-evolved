@@ -8,6 +8,7 @@ local AISpawner = require(game.ServerScriptService.Services.AISpawnerService)
 local BeaconService = require(game.ServerScriptService.Services.BeaconService)
 local AtmosphereService = require(script.Parent.AtmosphereService)
 local OmenService = require(script.Parent.OmenService)
+local CodexService = require(script.Parent.CodexService)
 
 local M = {}
 local state = { night = 0, phase = "Lobby", omen = nil }
@@ -33,41 +34,60 @@ local function rollOmen()
 end
 
 function M.start(world)
-	worldRef = world
-	state.phase = "Day"
-	state.omen = nil
-	broadcast()
+        worldRef = world
+        state.phase = "Day"
+        state.omen = nil
+        CodexService.ResetCampStructures()
+        CodexService.UpdateWorldState({
+                day = 1,
+                phase = "Day",
+                omen = nil,
+        })
+        broadcast()
 end
 
 function M.startDay(world)
-	state.phase = "Day"; state.omen = nil
-	OmenService.Clear()
-	local RescueService = require(script.Parent.RescueService)
-	RescueService.GenerateDailyRescues()
-	BeaconService.OnDayStart()
-	AtmosphereService.OnOmenEnd()
-	broadcast()
+        state.phase = "Day"; state.omen = nil
+        OmenService.Clear()
+        local RescueService = require(script.Parent.RescueService)
+        RescueService.GenerateDailyRescues()
+        BeaconService.OnDayStart()
+        AtmosphereService.OnOmenEnd()
+        CodexService.UpdateWorldState({
+                day = math.max(state.night + 1, 1),
+                phase = "Day",
+                omen = nil,
+        })
+        CodexService.Emit("NIGHT_END", { night = state.night })
+        CodexService.Emit("DAY_START", { day = math.max(state.night + 1, 1) })
+        broadcast()
 end
 
 function M.startNight(world)
-	if world then
-		worldRef = world
-	end
-	state.phase = "Night"; state.night += 1
-	state.omen = rollOmen()
-	OmenService.Set(state.omen)
-	AtmosphereService.OnOmenStart(state.omen)
-	if state.omen then Net.PlaySound:FireAllClients("omen") end
-	BeaconService.OnNightStart()
-	local plan = WavePlanner(state.night, #Players:GetPlayers(), state.omen)
-	-- Simple miniboss flag on milestone nights
-	if state.night % 5 == 0 then table.insert(plan.squads, {type="Miniboss", count=1}) end
-	AISpawner.spawn(plan)
-	broadcast()
-	pcall(function()
-		local TutorialService = require(script.Parent.TutorialService)
-		for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
-			TutorialService.OnAction(plr, "start")
+        if world then
+                worldRef = world
+        end
+        state.phase = "Night"; state.night += 1
+        state.omen = rollOmen()
+        OmenService.Set(state.omen)
+        AtmosphereService.OnOmenStart(state.omen)
+        if state.omen then Net.PlaySound:FireAllClients("omen") end
+        BeaconService.OnNightStart()
+        local plan = WavePlanner(state.night, #Players:GetPlayers(), state.omen)
+        -- Simple miniboss flag on milestone nights
+        if state.night % 5 == 0 then table.insert(plan.squads, {type="Miniboss", count=1}) end
+        AISpawner.spawn(plan)
+        CodexService.UpdateWorldState({
+                day = math.max(state.night, 1),
+                phase = "Night",
+                omen = state.omen,
+        })
+        CodexService.Emit("NIGHT_START", { night = state.night, omen = state.omen })
+        broadcast()
+        pcall(function()
+                local TutorialService = require(script.Parent.TutorialService)
+                for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
+                        TutorialService.OnAction(plr, "start")
 		end
 	end)
 end

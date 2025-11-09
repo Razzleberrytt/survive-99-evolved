@@ -17,6 +17,7 @@ local TutorialService = require(game.ServerScriptService.Services.TutorialServic
 local GameService = require(game.ServerScriptService.Services.GameService)
 local RescueService = require(game.ServerScriptService.Services.RescueService)
 local Cosmetics = require(game.ServerScriptService.Services.CosmeticsService)
+local CodexService = require(game.ServerScriptService.Services.CodexService)
 
 local function throttleDenied()
 	return false, "throttled"
@@ -161,17 +162,19 @@ Remotes.registerFunction(
 Remotes.registerFunction(
 	"PurchaseProduct",
 	Validators.shape({ productKey = Validators.string }),
-	function(player, payload)
-		Analytics.PurchaseAttempt(player, payload.productKey)
-		local policy = StoreService.CanOffer(player)
-		if not policy.allowIAP then
-			Analytics.PurchaseResult(player, payload.productKey, false)
-			return false, "iap_blocked"
-		end
-		local ok, err = StoreService.PurchaseDevProduct(player, payload.productKey)
-		Analytics.PurchaseResult(player, payload.productKey, ok == true)
-		return ok, err
-	end,
+        function(player, payload)
+                Analytics.PurchaseAttempt(player, payload.productKey)
+                local policy = StoreService.CanOffer(player)
+                if not policy.allowIAP then
+                        Analytics.PurchaseResult(player, payload.productKey, false)
+                        CodexService.Emit("PURCHASE_RESULT", { player = player, playerUserId = player.UserId, key = payload.productKey, ok = false })
+                        return false, "iap_blocked"
+                end
+                local ok, err = StoreService.PurchaseDevProduct(player, payload.productKey)
+                Analytics.PurchaseResult(player, payload.productKey, ok == true)
+                CodexService.Emit("PURCHASE_RESULT", { player = player, playerUserId = player.UserId, key = payload.productKey, ok = ok == true })
+                return ok, err
+        end,
 	{ capacity = 4, refill = 0.5 }
 )
 

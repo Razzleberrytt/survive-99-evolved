@@ -32,13 +32,29 @@ local DataService = require(ServicesFolder.DataService)
 local BeaconService = require(ServicesFolder.BeaconService)
 local TutorialService = require(ServicesFolder.TutorialService)
 local PatchNotes = require(ServicesFolder.PatchNotesService)
+local CodexService = require(ServicesFolder.CodexService)
 
 game.Players.PlayerAdded:Connect(function(plr)
-	DataService.LoadProfileAsync(plr)
-	TutorialService.Begin(plr)
-	PatchNotes.PushIfNew(plr)
+        DataService.LoadProfileAsync(plr)
+        TutorialService.Begin(plr)
+        PatchNotes.PushIfNew(plr)
+        CodexService.OnPlayerAdded(plr)
 end)
-game.Players.PlayerRemoving:Connect(function(plr) DataService.SaveProfileAsync(plr) end)
+game.Players.PlayerRemoving:Connect(function(plr)
+        CodexService.OnPlayerRemoving(plr)
+        DataService.SaveProfileAsync(plr)
+end)
+
+CodexService.UpdateWorldState({
+        day = 1,
+        phase = "Day",
+        camp = {
+                beaconFuel = BeaconService.GetState().fuel,
+                position = BeaconService.GetCFrame().Position,
+                structures = {},
+        },
+        omen = nil,
+})
 
 GameService.start(World)
 
