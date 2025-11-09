@@ -1,0 +1,12 @@
+return function()
+    local RateLimiter = require(game.ServerScriptService.Server.Net.RateLimiter)
+    describe("RateLimiter", function()
+        it("allows initial burst", function()
+            local rl = RateLimiter.new(10, 3)
+            expect(rl:allow()).to.equal(true)
+            expect(rl:allow()).to.equal(true)
+            expect(rl:allow()).to.equal(true)
+            expect(rl:allow()).to.equal(false)
+        end)
+    end)
+end
