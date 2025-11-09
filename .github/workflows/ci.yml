@@ -1,39 +1,54 @@
-name: CI
-
+name: ci
 on:
   push:
-    branches: ["main", "master", "develop", "cursor/setup-survival-game-core-systems-add9"]
-  pull_request:
-
+    branches: [ "main" ]
+  pull_request: {}
+permissions:
+  contents: read
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Roblox tooling
-        uses: ok-nick/setup-rojo@v1
+      - name: Install Aftman
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/LPGhatguy/aftman/main/install.sh | bash
+          echo "$HOME/.aftman/bin" >> $GITHUB_PATH
+
+      - name: Install toolchain
+        run: |
+          aftman install
+          echo "Aftman tools:" && ls -l "$HOME/.aftman/bin" || true
+
+      - name: Wally install
+        run: |
+          if command -v wally >/dev/null; then
+            wally install
+          else
+            echo "wally not found via aftman; ensure aftman.toml pins wally." && exit 1
+          fi
+
+      - name: Lint & Format (non-blocking for now)
+        run: |
+          if command -v stylua >/dev/null; then stylua --check . || true; fi
+          if command -v selene >/dev/null; then selene . || true; fi
+
+      - name: Run tests (best-effort)
+        run: |
+          bash scripts/run-tests.sh || true
+
+      - name: Build rbxm
+        run: |
+          if command -v rojo >/dev/null; then
+            rojo build --output Survive99.rbxm default.project.json
+          else
+            echo "rojo not found via aftman; ensure aftman.toml pins rojo." && exit 1
+          fi
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
-          rojo-version: 7.4.1
-
-      - name: Install dependencies
-        run: |
-          if [ -f aftman.toml ]; then
-            curl -L https://github.com/LPGhatguy/aftman/releases/download/v0.2.8/aftman-x86_64-unknown-linux-gnu.tar.gz | tar -xz
-            ./aftman self-install
-            ./aftman install
-          fi
-          if [ -f wally.toml ]; then
-            curl -L https://github.com/UpliftGames/wally/releases/download/v0.3.2/wally-linux.zip -o wally.zip
-            unzip -o wally.zip -d wally-bin
-            ./wally-bin/wally install
-          fi
-
-      - name: Rojo build
-        run: |
-          rojo build default.project.json --output out.rbxlx
-
-      - name: Lint placeholder
-        run: |
-          echo "No headless lint configured yet"
+          name: Survive99-build
+          path: Survive99.rbxm
