@@ -4,17 +4,18 @@ local ProfileStore = require(script.Parent.ProfileStore)
 local profiles = {}
 local SCHEMA = 1
 local TEMPLATE = {
-	_schema = SCHEMA,
-	bestNight = 0,
-	totalRescues = 0,
-	currencies = { shards = 0 },
-	talents = {},
-	cosmetics = { outfits = {}, emotes = {}, campThemes = {} },
-	beaconModsOwned = {},
-	settings = { accessibility = { captions = true, reduceFlashes = true }, input = { stickLayout = "default" } },
-	equippedCamp = nil,
-	equippedOutfit = nil,
-	lastSeenVersion = nil,
+        _schema = SCHEMA,
+        bestNight = 0,
+        totalRescues = 0,
+        currencies = { shards = 0 },
+        talents = {},
+        cosmetics = { outfits = {}, emotes = {}, campThemes = {} },
+        beaconModsOwned = {},
+        settings = { accessibility = { captions = true, reduceFlashes = true }, input = { stickLayout = "default" } },
+        equippedCamp = nil,
+        equippedOutfit = nil,
+        lastSeenVersion = nil,
+        codex = { seen = {}, completed = {} },
 }
 
 local function migrate(p)
@@ -27,11 +28,14 @@ local function migrate(p)
 	p.equippedOutfit = p.equippedOutfit or nil
 	p.lastSeenVersion = p.lastSeenVersion or nil
 	p.cosmetics = p.cosmetics or { outfits = {}, emotes = {}, campThemes = {} }
-	p.cosmetics.outfits = p.cosmetics.outfits or {}
-	p.cosmetics.campThemes = p.cosmetics.campThemes or {}
-	p.cosmetics.emotes = p.cosmetics.emotes or {}
-	p.currencies = p.currencies or { shards = 0 }
-	return p
+        p.cosmetics.outfits = p.cosmetics.outfits or {}
+        p.cosmetics.campThemes = p.cosmetics.campThemes or {}
+        p.cosmetics.emotes = p.cosmetics.emotes or {}
+        p.currencies = p.currencies or { shards = 0 }
+        p.codex = p.codex or { seen = {}, completed = {} }
+        p.codex.seen = p.codex.seen or {}
+        p.codex.completed = p.codex.completed or {}
+        return p
 end
 
 local M = {}
@@ -67,7 +71,27 @@ function M.GrantBlueprintOrToken(userId)
 end
 
 function M.GetProfileSnapshot(player)
-	return profiles[player.UserId]
+        return profiles[player.UserId]
+end
+
+local function ensureCodex(player)
+        local profile = profiles[player.UserId] or M.LoadProfileAsync(player)
+        profile.codex = profile.codex or { seen = {}, completed = {} }
+        profile.codex.seen = profile.codex.seen or {}
+        profile.codex.completed = profile.codex.completed or {}
+        return profile
+end
+
+function M.MarkCodexSeen(player, promptId)
+        if not promptId then return end
+        local profile = ensureCodex(player)
+        profile.codex.seen[promptId] = true
+end
+
+function M.MarkCodexCompleted(player, promptId)
+        if not promptId then return end
+        local profile = ensureCodex(player)
+        profile.codex.completed[promptId] = true
 end
 
 return M

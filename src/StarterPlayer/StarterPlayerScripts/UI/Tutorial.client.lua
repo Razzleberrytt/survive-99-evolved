@@ -32,10 +32,11 @@ local function hide()
 end
 
 Net.TutorialEvent.OnClientEvent:Connect(function(payload)
-	if not payload then return end
-	if payload.step == "fuel" then
-		show("Step 1: Tap +5 Fuel to feed the Beacon.")
-	elseif payload.step == "place" then
+        if not payload then return end
+        if payload.step == nil then return end
+        if payload.step == "fuel" then
+                show("Step 1: Tap +5 Fuel to feed the Beacon.")
+        elseif payload.step == "place" then
 		show("Step 2: Place a Wall near the beacon.")
 	elseif payload.step == "start" then
 		show("Step 3: Press Start Night.")

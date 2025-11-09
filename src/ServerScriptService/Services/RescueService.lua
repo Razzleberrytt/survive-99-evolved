@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local BeaconService = require(script.Parent.BeaconService)
 local Net = require(Rep.Remotes.Net)
 local DataService = require(script.Parent.DataService)
+local CodexService = require(script.Parent.CodexService)
 
 local M = {}
 local activeRescue = nil
@@ -51,10 +52,16 @@ game:GetService("RunService").Stepped:Connect(function()
 			activeRescue.inst.AssemblyLinearVelocity = Vector3.new(v.X, activeRescue.inst.AssemblyLinearVelocity.Y, v.Z)
 		else
 			-- Arrived!
-			DataService.GrantBlueprintOrToken(activeRescue.escorter)
-			if activeRescue.inst.Parent then activeRescue.inst:Destroy() end
-			activeRescue = nil
-			Net.BroadcastState:FireAllClients({ rescue = "complete" })
+                        DataService.GrantBlueprintOrToken(activeRescue.escorter)
+                        local escorterPlayer = Players:GetPlayerByUserId(activeRescue.escorter)
+                        CodexService.Emit("RESCUE_COMPLETE", {
+                                player = escorterPlayer,
+                                playerUserId = activeRescue.escorter,
+                                escorter = activeRescue.escorter,
+                        })
+                        if activeRescue.inst.Parent then activeRescue.inst:Destroy() end
+                        activeRescue = nil
+                        Net.BroadcastState:FireAllClients({ rescue = "complete" })
 		end
 	end
 end)

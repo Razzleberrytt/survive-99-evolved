@@ -14,6 +14,7 @@ local InstanceRef = require(Rep.Components.C_InstanceRef)
 local Trap = require(Rep.Components.C_Trap)
 
 local Net = require(Rep.Remotes.Net)
+local CodexService = require(script.Parent.CodexService)
 
 local M = {}
 local GRID = 2
@@ -88,11 +89,11 @@ function M.Place(player, placeType, cf)
 	local counts = placedCounts[player.UserId]; counts[placeType] = (counts[placeType] or 0) + 1
 	globalCount += 1
 
-	local p = createStructureInstance(placeType, snapped)
-	local world = WorldRegistry.get()
-	if world then
-		local comps = {
-			Buildable({ owner = player.UserId, type = placeType }),
+        local p = createStructureInstance(placeType, snapped)
+        local world = WorldRegistry.get()
+        if world then
+                local comps = {
+                        Buildable({ owner = player.UserId, type = placeType }),
 			Health({ hp = p:GetAttribute("HP"), max = p:GetAttribute("HP") }),
 			InstanceRef({ inst = p }),
 		}
@@ -101,13 +102,16 @@ function M.Place(player, placeType, cf)
 		elseif placeType == "SlowTotem" then
 			table.insert(comps, Trap({ kind = "Slow", cooldown = 0 }))
 		end
-		world:spawn(table.unpack(comps))
-	end
+                world:spawn(table.unpack(comps))
+        end
 
-	-- Tutorial hook (non-fatal)
-	pcall(function()
-		require(script.Parent.TutorialService).OnAction(player, "place")
-	end)
+        CodexService.RecordStructurePlacement(placeType)
+        CodexService.Emit("STRUCTURE_PLACED", { player = player, playerUserId = player.UserId, structure = placeType })
+
+        -- Tutorial hook (non-fatal)
+        pcall(function()
+                require(script.Parent.TutorialService).OnAction(player, "place")
+        end)
 
 	return p:GetDebugId()
 end
