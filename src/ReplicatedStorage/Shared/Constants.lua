@@ -5,6 +5,10 @@ local Constants = {}
 
 Constants.VERSION = "0.1.0-foundation"
 
+-- Temporary local-playtest grant until server-authoritative gathering nodes exist.
+Constants.DEV_GRANT_STARTER_RESOURCES = true
+Constants.RESOURCE_DEPOSIT_RANGE = 18
+
 Constants.PHASES = {
 	LOBBY = "Lobby",
 	DAY = "Day",
@@ -24,11 +28,15 @@ Constants.REMOTES = {
 	REQUEST_ATTACK = "RequestAttack",
 	REQUEST_REVIVE = "RequestRevive",
 	REQUEST_CONSUME = "RequestConsume",
+	REQUEST_DEPOSIT_RESOURCE = "RequestDepositResource",
+	REQUEST_GATHER_RESOURCE = "RequestGatherResource",
+	REQUEST_SPEND_RESOURCE = "RequestSpendResource",
 	REQUEST_PURCHASE = "RequestPurchase",
 	STATE_PHASE_CHANGED = "StatePhaseChanged",
 	STATE_PLAYER_STATS = "StatePlayerStats",
 	STATE_BEACON = "StateBeacon",
 	STATE_INVENTORY = "StateInventory",
+	RESOURCE_STATE_CHANGED = "ResourceStateChanged",
 	STATE_WAVE = "StateWave",
 	UX_NOTIFICATION = "UxNotification",
 	PHASE_STATE_CHANGED = "PhaseStateChanged",

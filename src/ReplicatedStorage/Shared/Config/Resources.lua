@@ -8,6 +8,7 @@ local Resources = {
 		category = "material",
 		stats = {
 			baseStackSize = 50,
+			baseCarry = 30,
 			weight = 1,
 		},
 		tuning = {
@@ -23,6 +24,7 @@ local Resources = {
 		category = "material",
 		stats = {
 			baseStackSize = 40,
+			baseCarry = 20,
 			weight = 1,
 		},
 		tuning = {
@@ -38,6 +40,7 @@ local Resources = {
 		category = "supply",
 		stats = {
 			baseStackSize = 30,
+			baseCarry = 10,
 			restoreHealth = 15,
 		},
 		tuning = {
@@ -53,6 +56,7 @@ local Resources = {
 		category = "beacon",
 		stats = {
 			baseStackSize = 25,
+			baseCarry = 5,
 			beaconEnergy = 10,
 		},
 		tuning = {
@@ -82,6 +86,7 @@ local Resources = {
 		category = "rareCurrency",
 		stats = {
 			baseStackSize = 999,
+			baseCarry = 3,
 		},
 		tuning = {
 			persistBetweenRuns = true,
@@ -89,5 +94,15 @@ local Resources = {
 		},
 	},
 }
+
+function Resources.GetCarryCaps()
+	local caps = {}
+	for resourceType, resourceConfig in pairs(Resources) do
+		if typeof(resourceConfig) == "table" and resourceConfig.stats and resourceConfig.stats.baseCarry then
+			caps[resourceType] = resourceConfig.stats.baseCarry
+		end
+	end
+	return caps
+end
 
 return Resources
