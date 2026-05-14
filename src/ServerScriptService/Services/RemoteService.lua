@@ -10,6 +10,8 @@ local REMOTE_CLASSES = {
 	[RemoteNames.PhaseStateChanged] = "RemoteEvent",
 	[RemoteNames.BeaconStateChanged] = "RemoteEvent",
 	[RemoteNames.RequestNightStartVote] = "RemoteEvent",
+	[RemoteNames.ResourceStateChanged] = "RemoteEvent",
+	[RemoteNames.RequestDepositResource] = "RemoteEvent",
 }
 
 local function getFolder(): Folder
