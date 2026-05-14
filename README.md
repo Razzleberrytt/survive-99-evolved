@@ -11,7 +11,7 @@ This is an existing Roblox/Rojo Luau project with both:
 - A canonical Rojo `src/` tree mapped by `default.project.json`.
 - Legacy starter roots (`Client/`, `Server/`, `Shared/`) and existing test folders (`test/`, `Tests/`) that should be preserved until a focused migration/cleanup PR confirms what is still useful.
 
-This foundation pass intentionally does **not** implement the full game. It establishes documentation, Rojo mapping, shared constants, and core starter config modules for future work.
+This project now includes the first tightly scoped server-authoritative loop: `RemoteService` creates named read-only remotes, `BeaconService` owns Beacon HP/shield/fuel state, and `PhaseService` advances through Lobby/Day/Dusk/Night/Dawn for client display. It still intentionally does **not** implement the full game.
 
 ## Expected tools
 
@@ -63,7 +63,7 @@ rojo build default.project.json --output build.rbxlx
 │   │       │   ├── Enemies.lua
 │   │       │   ├── Omens.lua
 │   │       │   └── Bosses.lua
-│   │       └── Remotes/
+│   │       └── Remotes/RemoteNames.lua
 │   ├── ServerScriptService/
 │   │   ├── Services/
 │   │   └── Systems/
@@ -78,7 +78,7 @@ rojo build default.project.json --output build.rbxlx
 
 ## Validation
 
-Run the available validation commands for your environment:
+Run the available validation commands for your environment. For the phase/beacon MVP, also follow [`docs/VALIDATION_PHASE_BEACON.md`](docs/VALIDATION_PHASE_BEACON.md) in Roblox Studio because the current shell test runner is a placeholder.
 
 ```sh
 rojo build default.project.json --output build.rbxlx
@@ -102,7 +102,7 @@ If a command is unavailable locally, install the project-standard tool or report
 ## Milestone roadmap
 
 1. **Foundation** — canonical docs, Rojo mapping, shared constants, and core config modules.
-2. **Core loop prototype** — day/night state machine, Beacon health/fuel, simple gathering, and server-validated building requests.
+2. **Core loop prototype** — day/night state machine and Beacon health/fuel are started; simple gathering and server-validated building requests remain future small PRs.
 3. **Combat prototype** — server-authoritative enemy spawning, player attacks, damage, revives, and basic wave resolution.
 4. **Base defense** — structures, traps, repairs, placement validation, and mobile build UI.
 5. **Progression and rewards** — fair run rewards, cosmetics-first persistence, analytics hooks, and anti-exploit checks.
@@ -111,4 +111,4 @@ If a command is unavailable locally, install the project-standard tool or report
 
 ## Recommended next Codex task
 
-Implement the first small playable server-authoritative loop: a minimal day/night phase service that updates Beacon state, exposes read-only phase updates through named remotes, and includes tests or Studio validation notes without adding client-authoritative gameplay.
+Implement MVP team resource inventory + deposit service, without building placement yet.

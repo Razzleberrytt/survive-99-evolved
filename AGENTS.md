@@ -37,6 +37,8 @@ Survive 99: Evolved is a mobile-first Roblox co-op survival/base-defense game. P
 
 Combat, resources, building, rewards, purchases, player health, revives, Beacon state, enemy spawning, wave outcomes, and persistence must be validated and finalized server-side. Clients may request actions and render feedback, but must never be trusted for damage, placement legality, currency balances, inventory changes, purchase grants, or saved data.
 
+Phase and Beacon work should build on `src/ServerScriptService/Services/PhaseService.lua`, `BeaconService.lua`, and server-owned remotes rather than replacing them or moving authority to clients.
+
 ## Mobile-first rule
 
 UI and controls must be readable and usable on phones first. Use large touch targets, short labels, clear contrast, safe-area awareness, simple input flows, and scalable HUD layouts. Desktop and gamepad support should not compromise mobile usability.

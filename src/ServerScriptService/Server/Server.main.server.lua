@@ -29,7 +29,9 @@ local BugReport = require(ServicesFolder.BugReportService)
 BugReport.Start()
 local GameService = require(ServicesFolder.GameService)
 local DataService = require(ServicesFolder.DataService)
+local RemoteService = require(ServicesFolder.RemoteService)
 local BeaconService = require(ServicesFolder.BeaconService)
+local PhaseService = require(ServicesFolder.PhaseService)
 local TutorialService = require(ServicesFolder.TutorialService)
 local PatchNotes = require(ServicesFolder.PatchNotesService)
 local CodexService = require(ServicesFolder.CodexService)
@@ -46,6 +48,11 @@ game.Players.PlayerRemoving:Connect(function(plr)
         CodexService.OnPlayerRemoving(plr)
         DataService.SaveProfileAsync(plr)
 end)
+
+RemoteService.Init()
+BeaconService.Init()
+PhaseService.Init()
+PhaseService.Start()
 
 SurvivalService.Start()
 CombatService.Start()
@@ -67,5 +74,8 @@ RunService.Stepped:Connect(function(_, dt)
 	for _, sys in systemFns do sys(World, dt) end
 end)
 
--- Ensure beacon UI gets an initial push
-task.delay(0.5, function() local s = BeaconService.GetState and BeaconService.GetState() if s then require(ReplicatedStorage.Remotes.Net).BeaconChanged:FireAllClients(s) end end)
+-- Ensure clients that join during bootstrap receive initial read-only state.
+task.delay(0.5, function()
+	BeaconService.BroadcastState()
+	PhaseService.BroadcastState()
+end)
