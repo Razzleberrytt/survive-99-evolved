@@ -1,79 +1,23 @@
 {
-  "name": "Survive-99-Evolved",
+  "name": "Survive 99: Evolved",
   "servePort": 34872,
   "tree": {
+    "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
-      "tree": {
-        "Shared": {
-          "$className": "Folder",
-          "tree": {
-            "Net": {
-              "$path": "Shared/Net"
-            },
-            "Config": {
-              "$path": "Shared/Config"
-            },
-            "Types": {
-              "$path": "Shared/Types"
-            }
-          }
-        },
-        "Tests": {
-          "$path": "Tests"
-        }
-      }
+      "$path": "src/ReplicatedStorage"
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "tree": {
-        "Server": {
-          "$className": "Folder",
-          "tree": {
-            "Services": {
-              "$path": "Server/Services"
-            },
-            "Systems": {
-              "$path": "Server/Systems"
-            },
-            "init.server.lua": {
-              "$path": "Server/init.server.lua"
-            },
-            "Net": {
-              "$className": "Folder",
-              "tree": {
-                "RateLimiter.lua": {
-                  "$path": "Server/Net/RateLimiter.lua"
-                },
-                "Validator.lua": {
-                  "$path": "Server/Net/Validator.lua"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$path": "src/ServerScriptService"
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
-      "tree": {
-        "StarterPlayerScripts": {
-          "$className": "StarterPlayerScripts",
-          "tree": {
-            "Client": {
-              "$className": "Folder",
-              "tree": {
-                "Systems": {
-                  "$path": "Client/Systems"
-                },
-                "init.client.lua": {
-                  "$path": "Client/init.client.lua"
-                }
-              }
-            }
-          }
-        }
-      }
+      "$path": "src/StarterPlayer"
+    },
+    "StarterGui": {
+      "$className": "StarterGui",
+      "$path": "src/StarterGui"
     }
   }
 }
