@@ -16,6 +16,7 @@ local validate = require(script.Parent.Net.Validator)
 
 local NetTypes = require(ReplicatedStorage.Shared.Types.NetTypes)
 local Products = require(ReplicatedStorage.Shared.Config.Products)
+local CombatSystem = require(script.Parent.Systems.CombatSystem)
 
 -- Create remotes
 local R_IN = {
@@ -67,7 +68,11 @@ for name, spec in pairs(NetTypes.ClientToServer) do
                 return
             end
 
-            -- TODO: route to gameplay systems (Combat, Revive, etc.)
+            if name == "Input_Attack" then
+                CombatSystem.Attack(player, payload.weaponId or "melee")
+            elseif name == "Input_Fire" then
+                CombatSystem.Attack(player, payload.weaponId or "pistol")
+            end
         end)
     end
 end

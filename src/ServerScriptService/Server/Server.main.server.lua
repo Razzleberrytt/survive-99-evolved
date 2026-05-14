@@ -33,6 +33,8 @@ local BeaconService = require(ServicesFolder.BeaconService)
 local TutorialService = require(ServicesFolder.TutorialService)
 local PatchNotes = require(ServicesFolder.PatchNotesService)
 local CodexService = require(ServicesFolder.CodexService)
+local SurvivalService = require(ServicesFolder.SurvivalService)
+local CombatService = require(ServicesFolder.CombatService)
 
 game.Players.PlayerAdded:Connect(function(plr)
         DataService.LoadProfileAsync(plr)
@@ -44,6 +46,9 @@ game.Players.PlayerRemoving:Connect(function(plr)
         CodexService.OnPlayerRemoving(plr)
         DataService.SaveProfileAsync(plr)
 end)
+
+SurvivalService.Start()
+CombatService.Start()
 
 CodexService.UpdateWorldState({
         day = 1,

@@ -17,6 +17,19 @@ local function makeLabel(name, posY)
 	return t
 end
 
+
+local function label(x, y, w, h, name)
+	local t = Instance.new("TextLabel")
+	t.Size = UDim2.new(0, w, 0, h)
+	t.Position = UDim2.new(0, x, 0, y)
+	t.TextXAlignment = Enum.TextXAlignment.Left
+	t.BackgroundTransparency = 0.3
+	t.Font = Enum.Font.Gotham
+	t.TextSize = 16
+	t.Parent = gui
+	return t
+end
+
 local lblTop = makeLabel("Top", 12)
 local lblMid = makeLabel("Mid", 44)
 local caption = makeLabel("Caption", 76)
@@ -26,9 +39,11 @@ local function setCaption(text)
 	Captions.push(text, 2.5, function(msg) caption.Text = msg end)
 end
 
+local lblSurvival = label(12, 108, 520, 28, "Survival")
+
 local lblShards = Instance.new("TextLabel")
 lblShards.Size = UDim2.new(0, 200, 0, 28)
-lblShards.Position = UDim2.new(0, 12, 0, 108)
+lblShards.Position = UDim2.new(0, 12, 0, 140)
 lblShards.BackgroundTransparency = 0.3
 lblShards.TextXAlignment = Enum.TextXAlignment.Left
 lblShards.Font = Enum.Font.GothamBold
@@ -51,17 +66,6 @@ makeButton("FuelPlus", 140, "+5 Fuel", function()
 	local ok, res = Net.FuelBeacon:InvokeServer({ amount = 5 })
 end)
 
-local function label(x, y, w, h, name)
-	local t = Instance.new("TextLabel")
-	t.Size = UDim2.new(0, w, 0, h)
-	t.Position = UDim2.new(0, x, 0, y)
-	t.TextXAlignment = Enum.TextXAlignment.Left
-	t.BackgroundTransparency = 0.3
-	t.Font = Enum.Font.Gotham
-	t.TextSize = 16
-	t.Parent = gui
-	return t
-end
 
 local lblCount = label(340, 12, 220, 28, "Count")
 
@@ -130,6 +134,18 @@ Net.BeaconChanged.OnClientEvent:Connect(function(s)
 end)
 
 draw()
+
+Net.SurvivalChanged.OnClientEvent:Connect(function(s)
+	lblSurvival.Text = string.format(
+		"HP %d/%d  Hunger %d  Thirst %d  Stamina %d  Lv %d",
+		math.floor(s.health or 0),
+		math.floor(s.maxHealth or 100),
+		math.floor(s.hunger or 0),
+		math.floor(s.thirst or 0),
+		math.floor(s.stamina or 0),
+		math.floor(s.level or 1)
+	)
+end)
 
 Net.BroadcastState.OnClientEvent:Connect(function(state)
 	if state.omen then setCaption("Omen: "..tostring(state.omen)) end

@@ -1,5 +1,4 @@
 local Rep = game:GetService("ReplicatedStorage")
-local Matter = require(Rep.Packages.matter)
 local C = require(Rep.Shared.Constants)
 local WorldRegistry = require(Rep.Shared.WorldRegistry)
 
@@ -17,73 +16,109 @@ local Boss = require(Rep.Components.C_Boss)
 local AssetLoader = require(script.Parent.AssetLoader)
 local SpawnPoints = require(script.Parent.SpawnPointService)
 local OmenService = require(script.Parent.OmenService)
+local Tuning = require(Rep.Shared.Config.Tuning)
+local GameConfig = require(Rep.Shared.Config.Game)
 
 local M = {}
 local active = 0
 
-local SPEED_BY_KIND = {
-	Forager = 14, Swarmling = 16, Bruiser = 10, Screecher = 13, Sapper = 12, Miniboss = 9,
-}
-local DMG_BY_KIND = {
-	Forager = 6, Swarmling = 4, Bruiser = 16, Screecher = 2, Sapper = 0, Miniboss = 24,
+local ENEMIES = GameConfig.Enemies
+
+local KIND_COLOR = {
+	Forager = Color3.fromRGB(205, 75, 60),
+	Swarmling = Color3.fromRGB(220, 110, 55),
+	Bruiser = Color3.fromRGB(145, 50, 50),
+	Screecher = Color3.fromRGB(130, 75, 200),
+	Sapper = Color3.fromRGB(210, 165, 55),
+	Miniboss = Color3.fromRGB(170, 0, 0),
 }
 
+local function profileFor(kind)
+	return ENEMIES[kind] or ENEMIES.Forager
+end
+
 local function makeEnemyPart(kind, position)
-  local model = AssetLoader.CloneEnemy(kind, position)
-  if model then
-    return model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
-  end
-  local p = Instance.new("Part")
-  p.Name = "Enemy_" .. kind
-  p.Size = Vector3.new(2,3,2)
-  p.Material = Enum.Material.SmoothPlastic
-  p.Color = (kind=="Miniboss") and Color3.fromRGB(170,0,0) or Color3.fromRGB(200,60,60)
-  p.Position = position + Vector3.new(0,2,0)
-  p.Anchored = false
-  p.CanCollide = true
-  p.Parent = workspace
-  return p
+	local model = AssetLoader.CloneEnemy(kind, position)
+	if model then
+		return model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart")
+	end
+
+	local p = Instance.new("Part")
+	p.Name = "Enemy_" .. kind
+	p.Size = kind == "Miniboss" and Vector3.new(4, 6, 4) or Vector3.new(2, 3, 2)
+	p.Material = Enum.Material.SmoothPlastic
+	p.Color = KIND_COLOR[kind] or KIND_COLOR.Forager
+	p.Position = position + Vector3.new(0, p.Size.Y / 2, 0)
+	p.Anchored = false
+	p.CanCollide = true
+	p:SetAttribute("EnemyKind", kind)
+	p.Parent = workspace
+	return p
+end
+
+local function capReached()
+	local tuningCap = (Tuning.get().Wave and Tuning.get().Wave.cap) or Tuning.get().waveCap or C.MaxNPCs
+	return active >= C.MaxNPCs or active >= tuningCap
 end
 
 local function spawnOne(kind, position)
-	if active >= C.MaxNPCs then return end
-	local world = WorldRegistry.get(); if not world then return end
+	if capReached() then return nil end
+	local world = WorldRegistry.get()
+	if not world then return nil end
+
+	local profile = profileFor(kind)
 	local part = makeEnemyPart(kind, position)
 	active += 1
-	part.Destroying:Connect(function() active -= 1 end)
+	part.Destroying:Connect(function()
+		active = math.max(0, active - 1)
+	end)
 
-	local speed = SPEED_BY_KIND[kind] or 12
+	local speed = profile.speed
 	if OmenService.Is("BloodMoon") then
-		speed = math.floor(speed * 1.15)
+		local omen = (Tuning.get().Omen and Tuning.get().Omen.BloodMoon) or { speedMult = 1.15 }
+		speed = math.floor(speed * (omen.speedMult or 1.15))
 	end
-	local dmg = DMG_BY_KIND[kind] or 6
 
 	local comps = {
 		EnemyType({ kind = kind, speed = speed }),
 		InstanceRef({ inst = part }),
-		AIState({ state = "Probe" }),
-		Health({ hp = (kind=="Miniboss") and 600 or 100, max = (kind=="Miniboss") and 600 or 100 }),
+		AIState({ state = profile.state or "Probe" }),
+		Health({ hp = profile.hp, max = profile.hp }),
 		Target({ target = nil }),
 		PathComp({ points = {}, i = 1, rethink = 0 }),
 		Motion({ speed = speed }),
-		Attack({ damage = dmg, radius = (kind=="Miniboss") and 6 or 4, cooldown = (kind=="Miniboss") and 1.0 or 1.2 }),
-		Loot({ shards = (kind=="Miniboss") and 5 or 1 }),
+		Attack({ damage = profile.damage, radius = profile.range or profile.radius, cooldown = profile.cooldown }),
+		Loot({ shards = profile.shards or 1 }),
 	}
-	if kind == "Miniboss" then table.insert(comps, Boss({stompMax=7})) end
-	local id = world:spawn(table.unpack(comps))
-	return id
+	if profile.boss then
+		table.insert(comps, Boss({ stompMax = 7 }))
+	end
+
+	return world:spawn(table.unpack(comps))
 end
 
 function M.spawn(plan)
-	for _, s in ipairs(plan.squads) do
-		for i = 1, s.count do
-			if active >= C.MaxNPCs then return end
-			if active >= (require(Rep.Shared.Config.Tuning).get().Wave.cap or 80) then return end
-			local cf = SpawnPoints.GetValidatedSpawn(80)
-			spawnOne(s.type, cf.Position)
-			-- balance hook already present
+	if not plan or not plan.squads then return 0 end
+	local spawned = 0
+	for _, squad in ipairs(plan.squads) do
+		for _ = 1, squad.count do
+			if capReached() then return spawned end
+			local cf = SpawnPoints.GetSpawnForKind(squad.type)
+			if spawnOne(squad.type, cf.Position) then
+				spawned += 1
+			end
 		end
 	end
+	return spawned
+end
+
+function M.GetActiveCount()
+	return active
+end
+
+function M.GetEnemyProfile(kind)
+	local source = profileFor(kind)
+	return table.clone(source)
 end
 
 return M

@@ -74,8 +74,6 @@ function M.startNight(world)
         if state.omen then Net.PlaySound:FireAllClients("omen") end
         BeaconService.OnNightStart()
         local plan = WavePlanner(state.night, #Players:GetPlayers(), state.omen)
-        -- Simple miniboss flag on milestone nights
-        if state.night % 5 == 0 then table.insert(plan.squads, {type="Miniboss", count=1}) end
         AISpawner.spawn(plan)
         CodexService.UpdateWorldState({
                 day = math.max(state.night, 1),
