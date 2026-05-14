@@ -10,6 +10,7 @@ Constants.PHASES = {
 	DAY = "Day",
 	DUSK = "Dusk",
 	NIGHT = "Night",
+	DAWN = "Dawn",
 	BOSS = "Boss",
 	ESCAPE = "Escape",
 	RESULTS = "Results",
@@ -30,6 +31,27 @@ Constants.REMOTES = {
 	STATE_INVENTORY = "StateInventory",
 	STATE_WAVE = "StateWave",
 	UX_NOTIFICATION = "UxNotification",
+	PHASE_STATE_CHANGED = "PhaseStateChanged",
+	BEACON_STATE_CHANGED = "BeaconStateChanged",
+	REQUEST_NIGHT_START_VOTE = "RequestNightStartVote",
+}
+
+Constants.DEFAULT_BEACON = {
+	maxHp = 1000,
+	hp = 1000,
+	maxShield = 0,
+	shield = 0,
+	fuel = 0,
+	level = 1,
+	auraRadius = 60,
+}
+
+Constants.PHASE_DURATIONS = {
+	[Constants.PHASES.LOBBY] = 10,
+	[Constants.PHASES.DAY] = 120,
+	[Constants.PHASES.DUSK] = 10,
+	[Constants.PHASES.NIGHT] = 120,
+	[Constants.PHASES.DAWN] = 10,
 }
 
 Constants.DEFAULT_PLAYER_STATS = {
