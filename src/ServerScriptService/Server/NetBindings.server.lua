@@ -17,11 +17,39 @@ local TutorialService = require(game.ServerScriptService.Services.TutorialServic
 local GameService = require(game.ServerScriptService.Services.GameService)
 local RescueService = require(game.ServerScriptService.Services.RescueService)
 local Cosmetics = require(game.ServerScriptService.Services.CosmeticsService)
+local CombatService = require(game.ServerScriptService.Services.CombatService)
 local CodexService = require(game.ServerScriptService.Services.CodexService)
 
 local function throttleDenied()
 	return false, "throttled"
 end
+
+
+Remotes.registerEvent(
+	"Input_Attack",
+	Validators.shape({
+		weaponId = Validators.string,
+		t = Validators.number,
+	}),
+	function(player, payload)
+		CombatService.Attack(player, payload)
+	end,
+	{ capacity = 8, refill = 4 }
+)
+
+Remotes.registerEvent(
+	"Input_Fire",
+	Validators.shape({
+		weaponId = Validators.string,
+		origin = Validators.Vector3,
+		dir = Validators.Vector3,
+		t = Validators.number,
+	}),
+	function(player, payload)
+		CombatService.Fire(player, payload)
+	end,
+	{ capacity = 12, refill = 6 }
+)
 
 Remotes.registerEvent(
 	"NightStartVote",

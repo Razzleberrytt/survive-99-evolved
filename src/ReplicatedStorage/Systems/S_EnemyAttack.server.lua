@@ -6,8 +6,23 @@ local EnemyType = require(Rep.Components.C_EnemyType)
 local Health = require(Rep.Components.C_Health)
 local Buildable = require(Rep.Components.C_Buildable)
 local Net = require(Rep.Remotes.Net)
+local SurvivalService = require(game.ServerScriptService.Services.SurvivalService)
 
 local structureRefs = {} -- [BasePart] = { id, hpC }
+
+local function nearestPlayer(inst, radius)
+	local bestPlayer, bestDist
+	for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+		local root = player.Character and player.Character.PrimaryPart
+		if root then
+			local dist = (root.Position - inst.Position).Magnitude
+			if dist <= radius and (not bestDist or dist < bestDist) then
+				bestPlayer, bestDist = player, dist
+			end
+		end
+	end
+	return bestPlayer
+end
 
 return function(world, dt)
 	-- Map structures
@@ -27,16 +42,24 @@ return function(world, dt)
 			if d < dist then nearest, nearestInst, dist = data, sInst, d end
 		end
 
-		if nearest and atk.cd <= 0 then
-			nearest.hpC.hp = math.max(0, nearest.hpC.hp - atk.damage)
-			atk.cd = atk.cooldown
-			-- VFX
-			Net.SpawnVFX:FireAllClients({ kind = "damage", part = nearestInst, amount = atk.damage })
-			Net.PlaySound:FireAllClients("hit")
+		if atk.cd <= 0 then
+			if nearest then
+				nearest.hpC.hp = math.max(0, nearest.hpC.hp - atk.damage)
+				atk.cd = atk.cooldown
+				Net.SpawnVFX:FireAllClients({ kind = "damage", part = nearestInst, amount = atk.damage })
+				Net.PlaySound:FireAllClients("hit")
 
-			if nearest.hpC.hp <= 0 then
-				if nearestInst and nearestInst.Parent then nearestInst:Destroy() end
-				world:despawn(nearest.id)
+				if nearest.hpC.hp <= 0 then
+					if nearestInst and nearestInst.Parent then nearestInst:Destroy() end
+					world:despawn(nearest.id)
+				end
+			else
+				local player = nearestPlayer(inst, atk.radius)
+				if player then
+					SurvivalService.Damage(player, atk.damage, et.kind)
+					atk.cd = atk.cooldown
+					Net.PlaySound:FireAllClients("hit")
+				end
 			end
 		end
 	end

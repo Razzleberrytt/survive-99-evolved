@@ -12,7 +12,7 @@ local AISpawner = require(game.ServerScriptService.Services.AISpawnerService)
 local Tuning = require(Rep.Shared.Config.Tuning)
 
 return function(world, dt)
-	for id, hp, ref, et in world:query(Health, InstanceRef, EnemyType) do
+	for id, hp, ref, et, loot in world:query(Health, InstanceRef, EnemyType, Loot) do
 		if hp.hp <= 0 then
 			-- Siphon mod: tiny fuel on enemy death near beacon
 			local ok, state = pcall(BeaconService.GetState)
@@ -21,7 +21,7 @@ return function(world, dt)
 				if d < 40 then BeaconService.ApplyFuel(0.2) end
 			end
 			-- Loot shards (tiny)
-			local shardAmt = (et.kind == "Miniboss") and 5 or 1
+			local shardAmt = (loot and loot.shards) or ((et.kind == "Miniboss") and 5 or 1)
 			-- naive: grant to all players nearby (MVP)
 			for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
 				local ch = plr.Character and plr.Character.PrimaryPart
